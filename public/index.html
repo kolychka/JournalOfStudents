@@ -1,0 +1,75 @@
+<html>
+<head>
+    <title>Журнал</title>
+    <link rel="stylesheet" href="css/vendor/bootstrap.min.css">
+    <link rel="stylesheet" href="css/main.css">
+    <script src="js/vendor/jquery-3.2.1.min.js"></script>
+    <script src="js/modules/server.js"></script>
+    <script src="js/modules/students.js"></script>
+    <script src="js/modules/schedule.js"></script>
+    <script src="js/modules/journal.js"></script>
+    <script src="js/modules/lesson.js"></script>
+    <script src="js/main.js"></script>
+</head>
+<body>
+    <div id="headers">
+        <div class="head" data-page-name="journal"><button type="button" class="btn btn-light headBtns">Отметить студентов</button></div>
+        <div class="head" data-page-name="schedule"><button type="button" class="btn btn-light headBtns">Расписание занятий</button></div>
+        <div class="head" data-page-name="students"><button type="button" class="btn btn-light headBtns">Удалить/Добавить студента(-ов)</button></div>
+        <div class="head" data-page-name="lesson"><button type="button" class="btn btn-light headBtns">Удалить/Добавить дисциплину</button></div>
+    </div>
+    <div id="pages">
+        <!-- страница отмечания -->
+        <div class="page journal">
+            <!-- страница редактирования студентов -->
+            <h3 class="headNames">Отметить студентов</h3>
+            <select id="schedule-select" class="custom-select"></select>
+            <div class="note-students"></div>
+            <input class="add-in-journal btn btn-light confirmBtns" type="button" value="Записать" /><br>
+        </div>
+        <div class="page students">
+            <div class="list-of-students"></div>
+            <!-- добавление студентов -->
+            <div class="add-student">
+                <h4 id="student">Добавить студента</h4>
+                <input class="form-control" id="student_name" placeholder="Имя" type="text">
+                <input class="form-control" id="student_surname" placeholder="Фамилия и инициалы" type="text">
+                <input class="form-control" id="student_subgroup" placeholder="Подгруппа" type="text">
+                <input class="confirmBtns btn btn-light" id="student_button" type="button" value="Добавить">
+            </div>
+        </div>
+        <!-- страница расписания -->
+        <div class="page schedule">
+            <h3 id="schedule_list" class="headNames">Расписание (в парах)</h3>
+            <div class="list-of-schedule"></div>
+            <!-- добавление в расписание -->
+            <div class="add-in-schedule">
+                <h4 id="schedule_add">Добавить в расписание</h4>
+                <input class="form-control scheduleInputs" id="schedule_day" placeholder="2018-09-05" type="date">
+                <select class="custom-select scheduleInputs" id="lesson-time-select">
+                    <option value="1">1 пара (8:20)</option>
+                    <option value="2">2 пара (10:00)</option>
+                    <option value="3">3 пара (12:10)</option>
+                    <option value="4">4 пара (13:50)</option>
+                    <option value="5">5 пара (15:50)</option>
+                    <option value="6">6 пара (17:30)</option>
+                    <option value="7">7 пара (19:00)</option>
+                </select>
+                <select class="custom-select scheduleInputs" id="lesson-select">
+                </select>
+                <input class="confirmBtns btn btn-light" id="schedule_button" type="button" value="Добавить">
+            </div>
+        </div>
+        <!-- страница отмечания -->
+        <div class="page lesson">
+            <div class="list-of-lessons"></div>
+            <!-- добавление дисциплин -->
+            <div class="add-lesson">
+                <h4 id = "lesson">Добавить дисциплину</h4>
+                <input class="form-control" id="lesson_name" placeholder="Название" type="text">
+                <input class="confirmBtns btn btn-light" id="lesson_button" type="button" value="Добавить">
+            </div>
+        </div>
+    </div>
+</body>
+</html>
