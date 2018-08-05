@@ -3,12 +3,21 @@ function Journal(options) {
     var db = options.db;
 
     this.addStudent = async function(name, surname, lastname, record_book, status) {
-        return db.addStudent(name, surname, lastname, record_book, status).then(function (result) {
+        var result = await db.addStudent(name, surname, lastname, record_book, status);
+        console.log(result, "1");
+        if (result) {
+            console.log(result, "2");
+            return await db.getStudent(name, record_book);
+        } else {
+            return 'Вероятно, такая запись уже существует.\n' + 
+            ' Проверьте вводимые данные.';
+        }
+        /*return db.addStudent(name, surname, lastname, record_book, status).then(function (result) {
             return (result) ? db.getStudent(name, record_book) : 'Вероятно, такая запись уже существует.\n' + 
             ' Проверьте вводимые данные.';
         });
         await db.addStudent(name, surname, lastname, record_book, status);
-        return await db.getStudent(name, record_book);
+        return await db.getStudent(name, record_book);*/
     };
 
     this.listOfStudents = function() {
@@ -19,10 +28,12 @@ function Journal(options) {
         return db.deleteStudent(id);
     };
 
-    this.addLesson = function(name) {
+    this.addLesson = async function(name) {
         return db.addLesson(name).then(function() {
-            return db.getLesson(name);
+            return (result) ? db.getLesson(name) : "Случилась какая-то ошибка, проверьте вводимые данные.";
         });
+        await db.addLesson(name);
+        return await db.getLesson(name);
     };
 
     this.listOfLessons = function() {

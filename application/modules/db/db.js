@@ -5,21 +5,35 @@ function DB() {
     var db;
 
     this.getStudent = function(name, record_book) {
-        var deferred = q.defer();
+        return new Promise((resolve, reject) => {
+            db.serialize(() => {
+                const query = "SELECT * FROM student WHERE name=? AND record_book=?";
+                db.get(query, [name, record_book], function (err, row) { resolve((err) ? null : row); });
+            });
+        });        
+        /*var deferred = q.defer();
         db.serialize(function () {
             var query = "SELECT * FROM student WHERE name=? AND record_book=?";
             db.get(query, [name, record_book], function (err, row) { deferred.resolve((err) ? null : row); });
         });
-        return deferred.promise;
+        return deferred.promise;*/
     };
 
     this.addStudent = function (name, surname, lastname, record_book, status) {
-        var deferred = q.defer();
+        return new Promise((resolve,reject) => {
+            db.serialize(() => {
+                const query = "INSERT INTO student (name, surname, lastname, record_book, status) VALUES (?, ?, ?, ?, ?)";
+                db.run(query, [name, surname, lastname, record_book, status], function (err) {
+                    resolve(!(err));
+                });
+            });
+        });
+        /*var deferred = q.defer();
         var query = "INSERT INTO student (name, surname, lastname, record_book, status) VALUES (?, ?, ?, ?, ?)";
         db.run(query, [name, surname, lastname, record_book, status], function (err) {
             deferred.resolve(!(err));
         });
-        return deferred.promise;
+        return deferred.promise;*/
     };
 
     this.getListOfStudents = function() {
@@ -31,30 +45,32 @@ function DB() {
         return deferred.promise;*/
         return new Promise((resolve, reject) => {
             db.serialize(() => {
-            const query = "SELECT * FROM student";
-            db.all(query, (err, rows) => { resolve((err) ? null : rows); });
-             });
+                const query = "SELECT * FROM student";
+                db.all(query, (err, rows) => { resolve((err) ? null : rows); });
+            });
         });
     };
 
     this.deleteStudent = function (id) {
-        var deferred = q.defer();
-        db.run("DELETE FROM journal WHERE student_id=?", [id], function(err){
-            if (!err) {
-                db.run("DELETE FROM student_subgroup WHERE id=?", [id], function (err) {
-                    deferred.resolve(!(err));
+        return new Promise((resolve, reject) => {
+            db.serialize(() => {
+                db.run("DELETE FROM journal WHERE student_id=?", [id], function(err){
+                    if (!err) {
+                        db.run("DELETE FROM student_subgroup WHERE id=?", [id], function (err) {
+                            resolve(!(err));
+                        });
+                        if (!err) {
+                            db.run("DELETE FROM student WHERE id=?", [id], function (err) {
+                                resolve(!(err));
+                            });
+                        } else {
+                            resolve(false);
+                        }
+                    }
                 });
-                if (!err) {
-                    db.run("DELETE FROM student WHERE id=?", [id], function (err) {
-                        deferred.resolve(!(err));
-                    });
-                } else {
-                    deferred.resolve(false);
-                }
-            }
+            });
         });
-        return deferred.promise;
-    };
+    };  
 
     this.getLesson = function(name) {
         var deferred = q.defer();
