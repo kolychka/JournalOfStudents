@@ -3,9 +3,10 @@ function Journal(options) {
     var db = options.db;
 
     this.addStudent = async function(name, surname, lastname, record_book, status) {
-        /*return db.addStudent(name, surname, lastname, record_book, status).then(function (result) {
-            return (result) ? db.getStudent(name, record_book) : 'Вероятно, такая запись уже существует. Проверьте вводимые данные.';
-        });*/
+        return db.addStudent(name, surname, lastname, record_book, status).then(function (result) {
+            return (result) ? db.getStudent(name, record_book) : 'Вероятно, такая запись уже существует.\n' + 
+            ' Проверьте вводимые данные.';
+        });
         await db.addStudent(name, surname, lastname, record_book, status);
         return await db.getStudent(name, record_book);
     };
@@ -32,13 +33,24 @@ function Journal(options) {
         return db.deleteLesson(id);
     };
 
-///////////////////////////////////////////////////////////////////////////
-
     this.addSubgroup = function(name, description, group_code) {
         return db.addSubgroup(name, description, group_code).then(function (result) {
-            return (result) ? db.getSubgroup(name, description, group_code) : 'Вероятно, такая запись уже существует. Проверьте вводимые данные.';
+            return (result) ? db.getSubgroup(name, description, group_code) : 'Вероятно, такая запись уже существует. \n' +
+            'Проверьте вводимые данные.';
         });
     };
+
+    this.listOfSubgroups = function() {
+        return db.getListOfSubgroups();
+    };
+
+    this.deleteSubgroup = function(id) {
+        return db.deleteSubgroup(id);
+    };
+
+///////////////////////////////////////////////////////////////////////////
+
+
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -49,7 +61,7 @@ function Journal(options) {
     };
 
     this.listOfSchedule = function() {
-        return db.listOfSchedule();
+        return db.getListOfSchedule();
     };
 
     this.deleteSchedule = function(id) {

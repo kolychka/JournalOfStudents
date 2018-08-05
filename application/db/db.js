@@ -97,8 +97,6 @@ function DB() {
         return deferred.promise;
     };
 
-///////////////////////////////////////////////////////////////////////////
-
     this.getSubgroup = function(name, description, group_code) {
         var deferred = q.defer();
         db.serialize(function () {
@@ -117,6 +115,48 @@ function DB() {
         return deferred.promise;
     };
 
+    this.getListOfSubgroups = function() {
+        /*var deferred = q.defer();
+        db.serialize(function () {
+            var query = "SELECT * FROM student";
+            db.all(query, function (err, row) { deferred.resolve((err) ? null : row); });
+        });
+        return deferred.promise;*/
+        return new Promise((resolve, reject) => {
+            db.serialize(() => {
+            const query = "SELECT * FROM subgroup";
+            db.all(query, (err, rows) => { resolve((err) ? null : rows); });
+             });
+        });
+    };
+
+    this.deleteSubgroup = function(id) {
+        var deferred = q.defer();
+        db.run("DELETE FROM schedule WHERE subgroup_id=?", [id], function(err){
+            if (!err) {
+                db.run("DELETE FROM lesson_subgroup WHERE subgroup_id=?", [id], function(err){
+                    deferred.resolve(!(err));
+                });
+                if (!err) {
+                    db.run("DELETE FROM student_subgroup WHERE subgroup_id =?", [id], function(err){
+                        deferred.resolve(!(err));
+                    });
+                    if (!err) {
+                        db.run("DELETE FROM subgroup WHERE id=?", [id], function(err) {
+                            deferred.resolve(!(err));
+                        });
+                    } else {
+                        deferred.resolve(false); 
+                    }
+                }
+            }
+        });
+        return deferred.promise;
+    };
+
+///////////////////////////////////////////////////////////////////////////
+
+
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -129,7 +169,7 @@ function DB() {
         return deferred.promise;
     };
 
-    this.listOfSchedule = function() {
+    this.getListOfSchedule = function() {
         var deferred = q.defer();
         db.serialize(function () {
             var query = "SELECT schedule.id AS scheduleId, schedule.day, schedule.time, lesson.name\n" +
