@@ -38,6 +38,7 @@ function Router(options) {
         (+)  uploadData; // выгрузить данные attendance
     */
 
+// STUDENT
     router.get('/addStudent', async function(req, res) {
         var name = req.query.name;
         var surname = req.query.surname;
@@ -45,51 +46,52 @@ function Router(options) {
         var record_book = req.query.record_book;
         var status = req.query.status;
         if (name && record_book) {
-        	res.send(await journal.addStudent(name, surname, lastname, record_book, status))
+        	res.send(await journal.addStudent(name, surname, lastname, record_book, status));
         } else {
             res.send('not enough parameters');
         }
     });
-    
-    router.get('/listOfStudents', function(req, res) {
-        journal.listOfStudents().then(function (list) {
-            res.send(list);
-        });
+
+    router.get('/listOfStudents', async function(req, res) {
+        res.send(await journal.listOfStudents());
     });
 
     router.get('/deleteStudent/:id', async function(req, res) {
         var id = req.params.id - 0;
         if (!isNaN(id)) {
-            res.send(await journal.deleteStudent(id))
+            res.send(await journal.deleteStudent(id));
         } else {
             res.send('not enough id parameter');
         }
     });
 
+// LESSON   
     router.get('/addLesson', async function (req, res){
         var name = req.query.name;
         if (name) {
-                res.send(await journal.addLesson(name));
+            res.send(await journal.addLesson(name));
         } else {
             res.send('not enough parameter');
         }
     });
-
-    router.get('/listOfLessons', function(req, res) {
-        journal.listOfLessons().then(function (list) {
-            res.send(list);
-        });
+ 
+    router.get('/listOfLessons', async function(req, res) {
+        res.send(await journal.listOfLessons());
     });
 
-    router.get('/deleteLesson/:id', function(req, res) {
+    router.get('/deleteLesson/:id', async function(req, res) {
         var id = req.params.id - 0;
+        console.log(id, "i am in router 1");
         if (!isNaN(id)) {
-            journal.deleteLesson(id).then((result) => res.send(result));
+            console.log(id, "i am in router 2");
+            res.send(await journal.deleteLesson(id));
         } else {
+            console.log(id, "i am in router 1");
             res.send('not enough id parameter');
         }
     });
 
+// SUBGROUP 
     router.get('/addSubgroup', function(req, res) {
         var name = req.query.name;
         var description = req.query.description;
@@ -120,21 +122,22 @@ function Router(options) {
 
 ///////////////////////////////////////////////////////////////////////////
 
-/*router.get('/addUser', async function(req, res) {
-    var role = req.query.role;
-    var name = req.query.name;
-    var login = req.query.login;
-    var password = req.query.password;
-    //var token = req.query.token;
-    if (role && name && login && password) {
-        res.send(await journal.addStudent(role, name, lastname, login, password))
-    } else {
-        res.send('not enough parameters');
-    }
-});*/
+    /*router.get('/addUser', async function(req, res) {
+        var role = req.query.role;
+        var name = req.query.name;
+        var login = req.query.login;
+        var password = req.query.password;
+        //var token = req.query.token;
+        if (role && name && login && password) {
+            res.send(await journal.addStudent(role, name, lastname, login, password))
+        } else {
+            res.send('not enough parameters');
+        }
+    });*/
 
 ///////////////////////////////////////////////////////////////////////////
 
+// SCHEDULE
     router.get('/addSchedule', function(req, res) {
         var time = req.query.time;
         var day = req.query.day;
@@ -164,6 +167,7 @@ function Router(options) {
         }
     });
 
+// OTHERS    
     // метод про ОТМЕТИТЬ студентов; пример строки - 1,0;2,1;3,0;4,1
     router.get('/noteStudents', function(req, res) {
         var noteList = req.query.noteList;

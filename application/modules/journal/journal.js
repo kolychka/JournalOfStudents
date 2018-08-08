@@ -2,11 +2,10 @@ function Journal(options) {
 
     var db = options.db;
 
+// STUDENT  
     this.addStudent = async function(name, surname, lastname, record_book, status) {
         var result = await db.addStudent(name, surname, lastname, record_book, status);
-        console.log(result, "1");
         if (result) {
-            console.log(result, "2");
             return await db.getStudent(name, record_book);
         } else {
             return 'Вероятно, такая запись уже существует.\n' + 
@@ -28,12 +27,20 @@ function Journal(options) {
         return db.deleteStudent(id);
     };
 
+// LESSON
     this.addLesson = async function(name) {
-        return db.addLesson(name).then(function() {
+        var result = await db.addLesson(name);
+        if (result) {
+            return await db.getLesson(name);
+        } else {
+            return 'Вероятно, такая запись уже существует.\n' + 
+            ' Проверьте вводимые данные.';
+        }
+        /*return db.addLesson(name).then(function() {
             return (result) ? db.getLesson(name) : "Случилась какая-то ошибка, проверьте вводимые данные.";
         });
         await db.addLesson(name);
-        return await db.getLesson(name);
+        return await db.getLesson(name);*/
     };
 
     this.listOfLessons = function() {
@@ -41,9 +48,11 @@ function Journal(options) {
     };
 
     this.deleteLesson = function(id) {
+        console.log(id, "I am in journal");
         return db.deleteLesson(id);
     };
 
+// SUBGROUP 
     this.addSubgroup = function(name, description, group_code) {
         return db.addSubgroup(name, description, group_code).then(function (result) {
             return (result) ? db.getSubgroup(name, description, group_code) : 'Вероятно, такая запись уже существует. \n' +
@@ -65,6 +74,7 @@ function Journal(options) {
 
 ///////////////////////////////////////////////////////////////////////////
 
+// SCHEDULE
     this.addSchedule = function(time, day, lesson_id, subgroup_id) {
         return db.addSchedule(time, day, lesson_id, subgroup_id).then(function() {
             return db.getSchedule(time, day, lesson_id, subgroup_id);
@@ -79,6 +89,7 @@ function Journal(options) {
         return db.deleteSchedule(id);
     };
 
+// OTHERS    
     this.noteStudents = function(noteList, schedule_id){
         var arr = noteList.split(';');
         var res = [];

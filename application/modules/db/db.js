@@ -4,6 +4,7 @@ var sqlite3 = require('sqlite3').verbose();
 function DB() {
     var db;
 
+// STUDENT    
     this.getStudent = function(name, record_book) {
         return new Promise((resolve, reject) => {
             db.serialize(() => {
@@ -72,35 +73,77 @@ function DB() {
         });
     };  
 
+// LESSON    
     this.getLesson = function(name) {
-        var deferred = q.defer();
+        return new Promise((resolve, reject) => {
+            db.serialize(() => {
+                const query = "SELECT * FROM lesson WHERE name=?";
+                db.get(query, [name], function (err, row) { resolve((err) ? null : row); });
+            });
+        });
+        /*var deferred = q.defer();
         db.serialize(function () {
             var query = "SELECT * FROM lesson WHERE name=?";
             db.get(query, [name], function (err, row) { deferred.resolve((err) ? null : row); });
         });
-        return deferred.promise;
+        return deferred.promise;*/
     };
 
     this.addLesson = function (name) {
-        var deferred = q.defer();
+        return new Promise((resolve, reject) => {
+            db.serialize(() => {
+                const query = "INSERT INTO lesson (name) VALUES (?)";
+                db.run(query, [name], function (err) {
+                    resolve(!(err));
+                });
+            });
+        });
+        /*var deferred = q.defer();
         var query = "INSERT INTO lesson (name) VALUES (?)";
         db.run(query, [name], function (err) {
             deferred.resolve(!(err));
         });
-        return deferred.promise;
+        return deferred.promise;*/
     };
 
     this.getListOfLessons = function() {
-        var deferred = q.defer();
+        return new Promise((resolve, reject) => {
+            db.serialize(() => {
+                const query = "SELECT * FROM lesson";
+                db.all(query, function (err, row) { resolve((err) ? null : row); });
+            });
+        });
+        /*var deferred = q.defer();
         db.serialize(function () {
             var query = "SELECT * FROM lesson";
             db.all(query, function (err, row) { deferred.resolve((err) ? null : row); });
         });
-        return deferred.promise;
+        return deferred.promise;*/
     };
 
     this.deleteLesson = function (id) {
-        var deferred = q.defer();
+        return new Promise((resolve, reject) => {
+            db.serialize(() => {
+                db.run("DELETE FROM schedule WHERE lesson_id=?", [id], function (err) {
+                    resolve(!(err));
+                });
+                if (!err) {
+                    db.run("DELETE FROM lesson_subgroup WHERE lesson_id=?", [id], function (err) {
+                        resolve(!(err));
+                    });
+                    if (!err) {
+                        db.run("DELETE FROM lesson WHERE id=?", [id], function (err) {
+                            console.log(id, "i am in db 1");
+                            resolve(!(err));
+                        });
+                    } else {
+                        console.log(id, "i am in db 2");
+                        resolve(false);
+                    }
+                }   
+            });
+        });
+        /*var deferred = q.defer();
         db.run("DELETE FROM schedule WHERE lesson_id=?", [id], function(err){
             if (!err) {
                 db.run("DELETE FROM lesson WHERE id=?", [id], function (err) {
@@ -110,9 +153,10 @@ function DB() {
                 deferred.resolve(false);
             }
         });
-        return deferred.promise;
+        return deferred.promise;*/
     };
 
+// SUBGROUP    
     this.getSubgroup = function(name, description, group_code) {
         var deferred = q.defer();
         db.serialize(function () {
@@ -176,6 +220,7 @@ function DB() {
 
 ///////////////////////////////////////////////////////////////////////////
 
+// SCHEDULE
     this.getSchedule = function(time, day, lesson_id, subgroup_id) {
         var deferred = q.defer();
         db.serialize(function () {
@@ -220,6 +265,7 @@ function DB() {
         return deferred.promise;
     };
 
+// OTHERS    
     this.noteStudents = function (studentsList, schedule_id) {
         return new Promise(function(resolve, reject) {
             if (studentsList && studentsList.length && schedule_id) {
