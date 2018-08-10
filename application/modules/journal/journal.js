@@ -4,6 +4,7 @@ function Journal(options) {
 
 // STUDENT  
     this.addStudent = async function(name, surname, lastname, record_book, status) {
+        console.log(name, surname, lastname, record_book, status, "i am in journal");
         var result = await db.addStudent(name, surname, lastname, record_book, status);
         if (result) {
             return await db.getStudent(name, record_book);

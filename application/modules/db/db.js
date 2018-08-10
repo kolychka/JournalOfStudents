@@ -5,13 +5,18 @@ function DB() {
     var db;
 
 // STUDENT    
-    this.getStudent = function(name, record_book) {
-        return new Promise((resolve, reject) => {
-            db.serialize(() => {
-                const query = "SELECT * FROM student WHERE name=? AND record_book=?";
-                db.get(query, [name, record_book], function (err, row) { resolve((err) ? null : row); });
-            });
-        });        
+    this.getStudent = (name, record_book) => { 
+        return new Promise((resolve, reject) => { 
+            db.serialize(() => { 
+                console.log(name, record_book, "i am in get in db");
+                db.get('SELECT * FROM student WHERE name=? AND record_book=?', [name, record_book], 
+                function (err, row) { resolve((err) ? null : row); }); 
+            }); 
+        }); 
+        /*db.serialize(() => {
+            const query = "SELECT * FROM student WHERE name=? AND record_book=?";
+            db.get(query, [name, record_book], function (err, row) { resolve((err) ? null : row); });
+        });*/        
         /*var deferred = q.defer();
         db.serialize(function () {
             var query = "SELECT * FROM student WHERE name=? AND record_book=?";
@@ -21,8 +26,10 @@ function DB() {
     };
 
     this.addStudent = function (name, surname, lastname, record_book, status) {
+        console.log(name, surname, lastname, record_book, status, "i am in add in db 1");
         return new Promise((resolve,reject) => {
             db.serialize(() => {
+                console.log(name, surname, lastname, record_book, status, "i am in add in db 2");
                 const query = "INSERT INTO student (name, surname, lastname, record_book, status) VALUES (?, ?, ?, ?, ?)";
                 db.run(query, [name, surname, lastname, record_book, status], function (err) {
                     resolve(!(err));
@@ -121,7 +128,19 @@ function DB() {
         return deferred.promise;*/
     };
 
-    this.deleteLesson = function (id) {
+    this.deleteLesson = async (id) => { 
+        return new Promise(async(resolve, reject) => { 
+            let result = false; 
+            //await db.run("DELETE FROM journal WHERE schedule_id = (SELECT id FROM schedule WHERE lesson_id = ", [id], ")", err => result = !err);
+            await db.run("DELETE FROM schedule WHERE lesson_id=?", [id], err => result = !err); 
+            await db.run("DELETE FROM lesson_subgroup WHERE lesson_id=?", [id], err => result = !err); 
+            await db.run("DELETE FROM lesson WHERE id=?", [id], err => result = !err); 
+            await this.deleteSchedule(id); 
+            resolve(result); 
+        }); 
+    };
+    
+    /*this.deleteLesson = function (id) {
         return new Promise((resolve, reject) => {
             db.serialize(() => {
                 db.run("DELETE FROM schedule WHERE lesson_id=?", [id], function (err) {
@@ -153,8 +172,8 @@ function DB() {
                 deferred.resolve(false);
             }
         });
-        return deferred.promise;*/
-    };
+        return deferred.promise;
+    };*/
 
 // SUBGROUP    
     this.getSubgroup = function(name, description, group_code) {
