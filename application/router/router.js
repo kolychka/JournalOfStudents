@@ -6,20 +6,20 @@ function Router(options) {
     var router = express.Router();
     var journal = options.journal;
 
-    /*
+    /* прототипы; переписать все delete, кроме deleteLesson
     //User:
-        addUser; // + пользователь
-        deleteUser; // - пользователь
-        listOfUsers; // вывод списка пользователей
+        (+)  addUser; // + пользователь
+        (+)  listOfUsers; // вывод списка пользователей
+        (сломан)  deleteUser; // - пользователь
 
     //Subgroup:
         (+)  addSubgroup; // + подгруппа
-        deleteSubgroup; // - подгруппа
+        (сломан)  deleteSubgroup; // - подгруппа
         (+)  listOfSubgroups; // вывод списка подгрупп
 
     //Student:
         (+)  addStudent; // + студент
-        (+)  deleteStudent; // - студент
+        (старый)  deleteStudent; // - студент
         (+)  listOfStudents; // вывод списка студентов
 
     //Lesson:
@@ -27,15 +27,15 @@ function Router(options) {
         (+)  deleteLesson; // - дисциплина
         (+)  listOfLessons; // вывод списка дисциплин
 
-    //Schedule:    
+    //Schedule:    ПЕРЕПИСАТЬ НА НОВЫЙ СТАНДАРТ
         (+)  addSchedule; // + пара
         (+)  listOfSchedule; // вывод списка занятий
         (+)  deleteSchedule; // - пара
 
-    //Journal:
-        deleteNotes;
-        (+)  noteStudents; // отметить студентов
-        (+)  uploadData; // выгрузить данные attendance
+    //Journal:      ПЕРЕПИСАТЬ ПОД НОВУЮ БД
+        deleteNotes; // удалить отметки какого-то занятия
+        noteStudents; // отметить студентов
+        uploadData; // выгрузить данные attendance
     */
 
 // STUDENT
@@ -81,72 +81,74 @@ function Router(options) {
 
     router.get('/deleteLesson/:id', async function(req, res) {
         var id = req.params.id - 0;
-        console.log(id, "i am in router 1");
         if (!isNaN(id)) {
-            console.log(id, "i am in router 2");
             res.send(await journal.deleteLesson(id));
         } else {
-            console.log(id, "i am in router 1");
             res.send('not enough id parameter');
         }
     });
 
 // SUBGROUP 
-    router.get('/addSubgroup', function(req, res) {
+    router.get('/addSubgroup', async function(req, res) {
         var name = req.query.name;
         var description = req.query.description;
         var group_code = req.query.group_code;
         if (name) {
-            journal.addSubgroup(name, description, group_code).then(function (result) {
-                res.send(result);
-            });
+            res.send(await journal.addSubgroup(name, description, group_code));
         } else {
             res.send('not enough parameters');
         }
     });
     
-    router.get('/listOfSubgroups', function(req, res) {
-        journal.listOfSubgroups().then(function (list) {
-            res.send(list);
-        });
+    router.get('/listOfSubgroups', async function(req, res) {
+        res.send(await journal.listOfSubgroups());
     });
     
-    router.get('/deleteSubgroup/:id', function(req, res) { 
+    router.get('/deleteSubgroup/:id', async function(req, res) { 
         var id = req.params.id - 0;
-        if (id) {
-            journal.deleteSubgroup(id).then((result) => res.send(result));
+        if (!isNaN(id)) {
+            res.send(await journal.deleteSubgroup(id));
         } else {
             res.send('not enough id parameter');
         }
     });
 
-///////////////////////////////////////////////////////////////////////////
-
-    /*router.get('/addUser', async function(req, res) {
+// USER
+    router.get('/addUser', async function(req, res) {
         var role = req.query.role;
         var name = req.query.name;
         var login = req.query.login;
         var password = req.query.password;
-        //var token = req.query.token;
+        var token = req.query.token;
         if (role && name && login && password) {
-            res.send(await journal.addStudent(role, name, lastname, login, password))
+            res.send(await journal.addUser(role, name, login, password));
         } else {
             res.send('not enough parameters');
         }
-    });*/
+    });
+    
+    router.get('/listOfUsers', async function(req, res) {
+        res.send(await journal.listOfUsers());
+    });
 
-///////////////////////////////////////////////////////////////////////////
+    router.get('/deleteUser/:id', async function(req, res) {
+        var id = req.params.id - 0;
+        if (!isNaN(id)) {
+            res.send(await journal.deleteUser(id));
+        } else {
+            res.send('not enough id parameter');
+        }
+    });
 
-// SCHEDULE
-    router.get('/addSchedule', function(req, res) {
+//////////////////////////////////////WORKSPACE//////////////////////////////////////
+    
+    router.get('/addSchedule', async function(req, res) {
         var time = req.query.time;
         var day = req.query.day;
         var lesson_id = req.query.lesson_id - 0;
         var subgroup_id = req.query.subgroup_id - 0;
-        if (time && day && !isNaN(lesson_id) && !isNaN(subgroup_id)) {
-            journal.addSchedule(time, day, lesson_id, subgroup_id).then(function (result) {
-                res.send(result);
-            });
+        if (!isNaN(time) && day && !isNaN(lesson_id) && !isNaN(subgroup_id)) {
+            res.send(await journal.addSchedule(time, day, lesson_id, subgroup_id));
         } else {
             res.send('not enough parameters');
         }
@@ -158,6 +160,9 @@ function Router(options) {
         });
     });
 
+//////////////////////////////////////WORKSPACE//////////////////////////////////////
+
+// SCHEDULE
     router.get('/deleteSchedule/:id', function(req, res) {
         var id = req.params.id - 0;
         if (!isNaN(id)) {
