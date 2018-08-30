@@ -8,15 +8,8 @@ function Journal(options) {
         if (result) {
             return await db.getStudent(name, record_book);
         } else {
-            return 'Вероятно, такая запись уже существует.\n' + 
-            ' Проверьте вводимые данные.';
+            return null;
         }
-        /*return db.addStudent(name, surname, lastname, record_book, status).then(function (result) {
-            return (result) ? db.getStudent(name, record_book) : 'Вероятно, такая запись уже существует.\n' + 
-            ' Проверьте вводимые данные.';
-        });
-        await db.addStudent(name, surname, lastname, record_book, status);
-        return await db.getStudent(name, record_book);*/
     };
 
     this.listOfStudents = function() {
@@ -33,14 +26,8 @@ function Journal(options) {
         if (result) {
             return await db.getLesson(name);
         } else {
-            return 'Вероятно, такая запись уже существует.\n' + 
-            ' Проверьте вводимые данные.';
+            return null;
         }
-        /*return db.addLesson(name).then(function() {
-            return (result) ? db.getLesson(name) : "Случилась какая-то ошибка, проверьте вводимые данные.";
-        });
-        await db.addLesson(name);
-        return await db.getLesson(name);*/
     };
 
     this.listOfLessons = function() {
@@ -57,8 +44,7 @@ function Journal(options) {
         if (result) {
             return await db.getSubgroup(name, description, group_code);
         } else {
-            return 'Вероятно, такая запись уже существует. \n' +
-            'Проверьте вводимые данные.';
+            return null;
         }
     };
 
@@ -76,8 +62,7 @@ function Journal(options) {
         if (result) {
             return await db.getUser(role, name);
         } else {
-            return 'Вероятно, такая запись уже существует.\n' + 
-            ' Проверьте вводимые данные.';
+            return null;
         }
     };
 
@@ -86,39 +71,30 @@ function Journal(options) {
     };
 
     this.deleteUser = function(id) {
-        console.log(id, "4");
         return db.deleteUser(id);
     };
 
-//////////////////////////////////////WORKSPACE//////////////////////////////////////
-
+// SCHEDULE
     this.addSchedule = async function(time, day, lesson_id, subgroup_id) {
         var result = await db.addSchedule(time, day, lesson_id, subgroup_id);
         if (result) {
             return await db.getSchedule(time, day, lesson_id, subgroup_id);
         } else {
-            return 'Вероятно, такая запись уже существует.\n' + 
-            ' Проверьте вводимые данные.';
+            return null;
         }
-        /*return db.addSchedule(time, day, lesson_id, subgroup_id).then(function() {
-            return db.getSchedule(time, day, lesson_id, subgroup_id);
-        });*/
     };
 
     this.listOfSchedules = function() {
         return db.getListOfSchedules();
     };
 
-//////////////////////////////////////WORKSPACE//////////////////////////////////////
-
-// SCHEDULE
-    this.listOfSchedule = function() {
-        return db.getListOfSchedule();
-    };
-
     this.deleteSchedule = function(id) {
         return db.deleteSchedule(id);
     };
+
+//////////////////////////////////////WORKSPACE//////////////////////////////////////
+
+//////////////////////////////////////WORKSPACE//////////////////////////////////////
 
 // OTHERS    
     this.noteStudents = function(noteList, schedule_id){

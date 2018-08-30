@@ -46,7 +46,8 @@ function Router(options) {
         var record_book = req.query.record_book;
         var status = req.query.status;
         if (name && record_book) {
-        	res.send(await journal.addStudent(name, surname, lastname, record_book, status));
+            const result = await journal.addStudent(name, surname, lastname, record_book, status);
+            res.send((result) ? result : 'Вероятно, такая запись уже существует. Проверьте вводимые данные.');
         } else {
             res.send('not enough parameters');
         }
@@ -69,7 +70,8 @@ function Router(options) {
     router.get('/addLesson', async function (req, res){
         var name = req.query.name;
         if (name) {
-            res.send(await journal.addLesson(name));
+            const result = await journal.addLesson(name);
+            res.send((result) ? result : 'Вероятно, такая запись уже существует. Проверьте вводимые данные.');
         } else {
             res.send('not enough parameter');
         }
@@ -94,7 +96,8 @@ function Router(options) {
         var description = req.query.description;
         var group_code = req.query.group_code;
         if (name) {
-            res.send(await journal.addSubgroup(name, description, group_code));
+            const result = await journal.addSubgroup(name, description, group_code);
+            res.send((result) ? result : 'Вероятно, такая запись уже существует. Проверьте вводимые данные.');
         } else {
             res.send('not enough parameters');
         }
@@ -121,7 +124,8 @@ function Router(options) {
         var password = req.query.password;
         var token = req.query.token;
         if (role && name && login && password) {
-            res.send(await journal.addUser(role, name, login, password));
+            const result = await journal.addUser(role, name, login, password);
+            res.send((result) ? result : 'Вероятно, такая запись уже существует. Проверьте вводимые данные.');
         } else {
             res.send('not enough parameters');
         }
@@ -133,15 +137,11 @@ function Router(options) {
   
     router.get('/deleteUser/:id', async function(req, res) {
         var id = req.params.id - 0;
-        console.log(id, "0");
         if (!isNaN(id)) {
-            console.log(id, "1");
             res.send(await journal.deleteUser(id));
-            console.log(id, "2");
         } else {
             res.send('not enough id parameter');
         }
-        console.log(id, "3");
     });
   
 // SCHEDULE
@@ -151,7 +151,8 @@ function Router(options) {
         var lesson_id = req.query.lesson_id - 0;
         var subgroup_id = req.query.subgroup_id - 0;
         if (!isNaN(time) && day && !isNaN(lesson_id) && !isNaN(subgroup_id)) {
-            res.send(await journal.addSchedule(time, day, lesson_id, subgroup_id));
+            const result = await journal.addSchedule(time, day, lesson_id, subgroup_id);
+            res.send((result) ? result : 'Вероятно, такая запись уже существует. Проверьте вводимые данные.');
         } else {
             res.send('not enough parameters');
         }
@@ -160,8 +161,6 @@ function Router(options) {
     router.get('/listOfSchedules', async function(req, res) {
         res.send(await journal.listOfSchedules());
     });
-
-//////////////////////////////////////WORKSPACE//////////////////////////////////////
    
     router.get('/deleteSchedule/:id', function(req, res) {
         var id = req.params.id - 0;
@@ -172,6 +171,8 @@ function Router(options) {
         }
     });
  
+//////////////////////////////////////WORKSPACE//////////////////////////////////////
+
 //////////////////////////////////////WORKSPACE//////////////////////////////////////
 
 // OTHERS    
