@@ -133,15 +133,11 @@ function Router(options) {
   
     router.get('/deleteUser/:id', async function(req, res) {
         var id = req.params.id - 0;
-        console.log(id, "0");
         if (!isNaN(id)) {
-            console.log(id, "1");
             res.send(await journal.deleteUser(id));
-            console.log(id, "2");
         } else {
             res.send('not enough id parameter');
         }
-        console.log(id, "3");
     });
   
 // SCHEDULE

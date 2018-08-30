@@ -4,192 +4,139 @@ var sqlite3 = require('sqlite3').verbose();
 function DB() {
     var db;
 
-// STUDENT    
+// STUDENT
     this.getStudent = (name, record_book) => { 
         return new Promise((resolve, reject) => { 
             db.serialize(() => { 
-                db.get('SELECT * FROM student WHERE name=? AND record_book=?', [name, record_book], 
-                function (err, row) { resolve((err) ? null : row); }); 
+                db.get('SELECT * FROM student WHERE name=? AND record_book=?', [name, record_book], (err, row) => resolve((err) ? null : row));
             }); 
         }); 
-        /*db.serialize(() => {
-            const query = "SELECT * FROM student WHERE name=? AND record_book=?";
-            db.get(query, [name, record_book], function (err, row) { resolve((err) ? null : row); });
-        });*/        
-        /*var deferred = q.defer();
-        db.serialize(function () {
-            var query = "SELECT * FROM student WHERE name=? AND record_book=?";
-            db.get(query, [name, record_book], function (err, row) { deferred.resolve((err) ? null : row); });
-        });
-        return deferred.promise;*/
     };
 
-    this.addStudent = function (name, surname, lastname, record_book, status) {
+    this.addStudent = (name, surname, lastname, record_book, status) => {
         return new Promise((resolve,reject) => {
-            db.serialize(() => {
-                const query = "INSERT INTO student (name, surname, lastname, record_book, status) VALUES (?, ?, ?, ?, ?)";
-                db.run(query, [name, surname, lastname, record_book, status], function (err) {
-                    resolve(!(err));
-                });
-            });
+            const query = "INSERT INTO student (name, surname, lastname, record_book, status) VALUES (?, ?, ?, ?, ?)";
+            db.run(query, [name, surname, lastname, record_book, status], err => resolve(!err));
         });
-        /*var deferred = q.defer();
-        var query = "INSERT INTO student (name, surname, lastname, record_book, status) VALUES (?, ?, ?, ?, ?)";
-        db.run(query, [name, surname, lastname, record_book, status], function (err) {
-            deferred.resolve(!(err));
-        });
-        return deferred.promise;*/
     };
 
-    this.getListOfStudents = function() {
-        /*var deferred = q.defer();
-        db.serialize(function () {
-            var query = "SELECT * FROM student";
-            db.all(query, function (err, row) { deferred.resolve((err) ? null : row); });
-        });
-        return deferred.promise;*/
+    this.getListOfStudents = () => {
         return new Promise((resolve, reject) => {
             db.serialize(() => {
-                const query = "SELECT * FROM student";
-                db.all(query, (err, rows) => { resolve((err) ? null : rows); });
+                db.all("SELECT * FROM student", (err, rows) => resolve((err) ? null : rows));
             });
         });
     };
 
-    this.deleteStudent = function (id) { // работает, но вариант старый
+    this.deleteStudent = (id) => { // работает, но вариант старый
         return new Promise((resolve, reject) => {
-            db.run("DELETE FROM journal WHERE student_id=?", [id], function(err){
-                if (!err) {
-                    db.run("DELETE FROM student_subgroup WHERE id=?", [id], function (err) {
-                        resolve(!(err));
-                    });
-                    if (!err) {
-                        db.run("DELETE FROM student WHERE id=?", [id], function (err) {
-                            resolve(!(err));
-                        });
-                    } else {
-                        resolve(false);
-                    }
-                }
+            db.run("DELETE FROM journal WHERE student_id=?" , [id], err => { 
+                (!err) ? 
+                    db.run("DELETE FROM student_subgroup WHERE id=?", [id], err => { 
+                        (!err) ? 
+                            db.run("DELETE FROM student WHERE id=?", [id], err => resolve(!err))
+                            : resolve(false);
+                    })
+                    : resolve(false);
             });
         });
     };  
 
 // LESSON    
-    this.getLesson = function(name) {
+    this.getLesson = (name) => {
         return new Promise((resolve, reject) => {
             db.serialize(() => {
                 const query = "SELECT * FROM lesson WHERE name=?";
-                db.get(query, [name], function (err, row) { resolve((err) ? null : row); });
+                db.get(query, [name], (err, row) => resolve((err) ? null : row));
             });
         });
-        /*var deferred = q.defer();
-        db.serialize(function () {
-            var query = "SELECT * FROM lesson WHERE name=?";
-            db.get(query, [name], function (err, row) { deferred.resolve((err) ? null : row); });
-        });
-        return deferred.promise;*/
     };
 
-    this.addLesson = function (name) {
+    this.addLesson = (name) => {
+        return new Promise((resolve, reject) => {
+            db.run("INSERT INTO lesson (name) VALUES (?)", [name], err => resolve(!err));
+        });
+    };
+
+    this.getListOfLessons = () => {
         return new Promise((resolve, reject) => {
             db.serialize(() => {
-                const query = "INSERT INTO lesson (name) VALUES (?)";
-                db.run(query, [name], function (err) {
-                    resolve(!(err));
-                });
+                db.all("SELECT * FROM lesson", (err, row) => resolve((err) ? null : row));
             });
         });
-        /*var deferred = q.defer();
-        var query = "INSERT INTO lesson (name) VALUES (?)";
-        db.run(query, [name], function (err) {
-            deferred.resolve(!(err));
-        });
-        return deferred.promise;*/
     };
 
-    this.getListOfLessons = function() {
-        return new Promise((resolve, reject) => {
-            db.serialize(() => {
-                const query = "SELECT * FROM lesson";
-                db.all(query, function (err, row) { resolve((err) ? null : row); });
+    this.deleteLesson = (id) => { //работает 
+        return new Promise((resolve, reject) => { 
+            db.run("DELETE FROM journal WHERE schedule_id = (SELECT id FROM schedule WHERE lesson_id=?)", [id], err => {
+                (!err) ? 
+                    db.run("DELETE FROM schedule WHERE lesson_id=?", [id], err => {
+                        (!err) ? 
+                            db.run("DELETE FROM lesson_subgroup WHERE lesson_id=?", [id], err => {
+                                (!err) ? 
+                                    db.run("DELETE FROM lesson WHERE id=?", [id], async err => {
+                                        if (!err) {
+                                            await this.deleteSchedule(id);
+                                            resolve(!err);
+                                        } else {
+                                            resolve(false);
+                                        }
+                                    })
+                                    : resolve(false);
+                            })
+                            : resolve(false);
+                    })
+                    : resolve(false);
             });
-        });
-        /*var deferred = q.defer();
-        db.serialize(function () {
-            var query = "SELECT * FROM lesson";
-            db.all(query, function (err, row) { deferred.resolve((err) ? null : row); });
-        });
-        return deferred.promise;*/
-    };
-
-    this.deleteLesson = async (id) => { //работает 
-        return new Promise(async(resolve, reject) => { 
-            let result = false; 
-            await db.run("DELETE FROM journal WHERE schedule_id = (SELECT id FROM schedule WHERE lesson_id=?)", [id], err => result = !err);
-            await db.run("DELETE FROM schedule WHERE lesson_id=?", [id], err => result = !err); 
-            await db.run("DELETE FROM lesson_subgroup WHERE lesson_id=?", [id], err => result = !err); 
-            await db.run("DELETE FROM lesson WHERE id=?", [id], err => result = !err); 
-            await this.deleteSchedule(id); 
-            resolve(result); 
         }); 
     };
    
 // SUBGROUP    
-    this.getSubgroup = function(name, description, group_code) {
+    this.getSubgroup = (name) => {
         return new Promise((resolve, reject) => {
             db.serialize(() => {
-                db.get("SELECT * FROM subgroup WHERE name=?", [name], (err, row) => { resolve((err) ? null : row); });
+                db.get("SELECT * FROM subgroup WHERE name=?", [name], (err, row) => resolve((err) ? null : row));
             });
         })
-        /*var deferred = q.defer();
-        db.serialize(function () {
-            var query = "SELECT * FROM subgroup WHERE name=?";
-            db.get(query, [name], function (err, row) { deferred.resolve((err) ? null : row); });
-        });
-        return deferred.promise;*/
     };
 
-    this.addSubgroup = function (name, description, group_code) {
+    this.addSubgroup = (name, description, group_code) => {
+        return new Promise((resolve, reject) => {
+            const query = "INSERT INTO subgroup (name, description, group_code) VALUES (?, ?, ?)";
+            db.run(query, [name, description, group_code], err => resolve(!err));
+        });
+    };
+
+    this.getListOfSubgroups = () => {
         return new Promise((resolve, reject) => {
             db.serialize(() => {
-                db.run("INSERT INTO subgroup (name, description, group_code) VALUES (?, ?, ?)", 
-                [name, description, group_code], function (err) {
-                    resolve(!(err));
-                });
+                db.all("SELECT * FROM subgroup", (err, row) => resolve((err) ? null : row));
             });
         });
-       /*var deferred = q.defer();
-        var query = "INSERT INTO subgroup (name, description, group_code) VALUES (?, ?, ?)";
-        db.run(query, [name, description, group_code], function (err) {
-            deferred.resolve(!(err));
-        });
-        return deferred.promise;*/
     };
 
-    this.getListOfSubgroups = function() {
-        return new Promise((resolve, reject) => {
-            db.serialize(() => {
-                db.all("SELECT * FROM subgroup", (err, row) => { resolve((err) ? null : row); });
-            });
-        });
-        /*var deferred = q.defer();
-        db.serialize(function () {
-            var query = "SELECT * FROM subgroup";
-            db.all(query, function (err, row) { deferred.resolve((err) ? null : row); });
-        });
-        return deferred.promise;*/
-    };
-
-    this.deleteSubgroup = async (id) => {
+    this.deleteSubgroup = (id) => {
         return new Promise(async(resolve, reject) => {
-            let result = false;
-            await db.run("DELETE FROM journal WHERE schedule_id = (SELECT id FROM schedule WHERE subgroup_id=?)", [id], err => result = !err);
-            await db.run("DELETE FROM schedule WHERE subgroup_id=?", [id], err => result = !err); 
-            await db.run("DELETE FROM lesson_subgroup WHERE subgroup_id=?", [id], err => result = !err); 
-            await db.run("DELETE FROM subgroup WHERE id=?", [id], err => result = !err); 
-            await this.deleteSchedule(id); 
-            resolve(result); 
+            db.run("DELETE FROM journal WHERE schedule_id = (SELECT id FROM schedule WHERE subgroup_id=?)", [id], err => {
+                (!err) ? 
+                    db.run("DELETE FROM schedule WHERE subgroup_id=?", [id], err => {
+                        (!err) ? 
+                            db.run("DELETE FROM lesson_subgroup WHERE subgroup_id=?", [id], err => {
+                                (!err) ? 
+                                    db.run("DELETE FROM subgroup WHERE id=?", [id], async err => {
+                                        if (!err) {
+                                            await this.deleteSchedule(id);
+                                            resolve(!err);
+                                        } else {
+                                            resolve(false);
+                                        }
+                                    })
+                                    : resolve(false);
+                            })
+                            : resolve(false);
+                    })
+                    : resolve(false);
+            });
         });
     };
 
@@ -197,8 +144,7 @@ function DB() {
     this.getUser = (role, name) => { 
         return new Promise((resolve, reject) => { 
             db.serialize(() => { 
-                db.get('SELECT * FROM user WHERE role=? AND name=?', [role, name], 
-                (err, row) => { resolve((err) ? null : row); }); 
+                db.get('SELECT * FROM user WHERE role=? AND name=?', [role, name], (err, row) => resolve((err) ? null : row)); 
             }); 
         }); 
     };
@@ -226,74 +172,55 @@ function DB() {
         });
     };
 
-//////////////////////////////////////WORKSPACE//////////////////////////////////////
-    
-    this.getSchedule = function(time, day, lesson_id, subgroup_id) {
+// SCHEDULE    
+    this.getSchedule = (time, day, lesson_id, subgroup_id) => {
         return new Promise((resolve, reject) => {
             db.serialize(() => {
-                db.get('SELECT * FROM schedule WHERE time=? AND day=? AND lesson_id=? AND subgroup_id=?', 
-                [time, day, lesson_id, subgroup_id], (err, row) => { resolve((err) ? null : row); });
+                const query = 'SELECT * FROM schedule WHERE time=? AND day=? AND lesson_id=? AND subgroup_id=?';
+                db.get(query, [time, day, lesson_id, subgroup_id], (err, row) => resolve((err) ? null : row));
             });
         });
-        /*var deferred = q.defer();
-        db.serialize(function () {
-            var query = "SELECT * FROM schedule WHERE time=? AND day=? AND lesson_id=? AND subgroup_id=?";
-            db.get(query, [time, day, lesson_id, subgroup_id], function (err, row) { deferred.resolve((err) ? null : row); });
-        });
-        return deferred.promise;*/
     };
 
-    this.addSchedule = function (time, day, lesson_id, subgroup_id) {
+    this.addSchedule = (time, day, lesson_id, subgroup_id) => {
         return new Promise((resolve, reject) => {
-            db.run("INSERT INTO schedule (time, day, lesson_id, subgroup_id) VALUES (?, ?, ?, ?)",
-            [time, day, lesson_id, subgroup_id], function (err) {
-                resolve(!(err));
-            });
+            const query = "INSERT INTO schedule (time, day, lesson_id, subgroup_id) VALUES (?, ?, ?, ?)";
+            db.run(query, [time, day, lesson_id, subgroup_id], err => resolve(!err));
         });
-        /*var deferred = q.defer();
-        var query = "INSERT INTO schedule (day, time, lesson_id) VALUES (?, ?, ?)";
-        db.run(query, [day, time, lesson_id], function (err) {
-            deferred.resolve(!(err));
-        });
-        return deferred.promise;*/
     };
 
-    this.getListOfSchedules = function() {
+    this.getListOfSchedules = () => {
         return new Promise((resolve, reject) => {
             db.serialize(() => {
-                db.all("SELECT * FROM schedule", (err, row) => { resolve((err) ? null : row); });
+                const query = "SELECT schedule.id AS scheduleId, " +
+                                    "schedule.day AS scheduleDay, " +
+                                    "schedule.time AS scheduleTime, " +
+                                    "lesson.name AS lessonName, " +
+                                    "subgroup.name AS subgroupName " +
+                                "FROM schedule " +
+                                    "INNER JOIN lesson ON schedule.lesson_id = lesson.id " +
+                                    "INNER JOIN subgroup ON schedule.subgroup_id = subgroup.id " +
+                                "ORDER BY schedule.day, schedule.time ASC;"
+                db.all(query, (err, row) => resolve((err) ? null : row));
             });
         });
-    };
-
-//////////////////////////////////////WORKSPACE//////////////////////////////////////
-
-// SCHEDULE
-    this.getListOfSchedule = function() {
-        var deferred = q.defer();
-        db.serialize(function () {
-            var query = "SELECT schedule.id AS scheduleId, schedule.day, schedule.time, lesson.name\n" +
-                "FROM schedule\n" +
-                "INNER JOIN lesson ON schedule.lesson_id = lesson.id \n" +
-                "ORDER BY schedule.day, schedule.time ASC";
-            db.all(query, function (err, row) { deferred.resolve((err) ? null : row); });
-        });
-        return deferred.promise;
     };
 
     this.deleteSchedule = function (id) {
-        var deferred = q.defer();
-        db.run("DELETE FROM journal WHERE schedule_id=?", [id], function(err){
-            if (!err) {
-                db.run("DELETE FROM schedule WHERE id=?", [id], function (err) {
-                    deferred.resolve(!(err));
-                });
-            } else {
-                deferred.resolve(false);
-            }
+        return new Promise((resolve, reject) => {
+            db.run("DELETE FROM journal WHERE schedule_id=?", [id], err => {
+                (!err) ?
+                    db.run("DELETE FROM schedule WHERE id=?", [id], err => {
+                        (!err) ? resolve(!err) : resolve(result);
+                    })
+                    : resolve(result); 
+            });
         });
-        return deferred.promise;
     };
+
+//////////////////////////////////////WORKSPACE//////////////////////////////////////
+
+//////////////////////////////////////WORKSPACE//////////////////////////////////////
 
 // OTHERS    
     this.noteStudents = function (studentsList, schedule_id) {
@@ -321,12 +248,19 @@ function DB() {
     this.getUploadData = function(startDate, finishDate) {
         var deferred = q.defer();
         db.serialize(function () {
-            var query = "SELECT student.surname, journal.status, schedule.day, schedule.time, lesson.name " +
-                "FROM student " +
-                "INNER JOIN journal on student.id = journal.student_id " +
-                "INNER JOIN schedule on schedule.id = journal.schedule_id AND " +
-                "schedule.day BETWEEN '" + startDate + "' AND '" + finishDate + "' " +
-                "INNER JOIN lesson on lesson.id = schedule.lesson_id";
+            var query = "SELECT student.name, " + 
+                                "student.lastname, " + 
+                                "student.surname, " + 
+                                "journal.status, " + 
+                                "schedule.day, " + 
+                                "schedule.time, " + 
+                                "lesson.name AS lessonName, " + 
+                                "subgroup.name AS subgroupName " +
+                        "FROM student " +
+                            "INNER JOIN journal on student.id = journal.student_id " +
+                            "INNER JOIN schedule on schedule.id = journal.schedule_id AND schedule.day BETWEEN '" + startDate + "' AND '" + finishDate + "' " +
+                            "INNER JOIN lesson on lesson.id = schedule.lesson_id " + 
+                            "INNER JOIN subgroup on subgroup.id = schedule.subgroup_id";
                 db.all(query, function (err, row) { console.log(err, row); deferred.resolve((err) ? null : row); });
         });
         return deferred.promise;
@@ -347,67 +281,3 @@ function DB() {
 }
 
 module.exports = DB;
-
-// http://localhost:3000/noteStudents?kind=lec&timetable_id=1&student_id=1&status=y
-// http://zametkinapolyah.ru/zametki-o-mysql/chast-12-14-obedinenie-tablic-v-sql-i-bazax-dannyx-sqlite-join-i-select.html
-// http://localhost:3000/addLesson?name=djkha
-// C:\listofstudents\application\modules\db
-
-    /*this.deleteSubgroup = function(id) {
-        var deferred = q.defer();
-        db.run("DELETE FROM schedule WHERE subgroup_id=?", [id], function(err){
-            if (!err) {
-                db.run("DELETE FROM lesson_subgroup WHERE subgroup_id=?", [id], function(err){
-                    deferred.resolve(!(err));
-                });
-                if (!err) {
-                    db.run("DELETE FROM student_subgroup WHERE subgroup_id =?", [id], function(err){
-                        deferred.resolve(!(err));
-                    });
-                    if (!err) {
-                        db.run("DELETE FROM subgroup WHERE id=?", [id], function(err) {
-                            deferred.resolve(!(err));
-                        });
-                    } else {
-                        deferred.resolve(false); 
-                    }
-                }
-            }
-        });
-        return deferred.promise;
-    };*/
-
-    /*this.deleteLesson = function (id) {
-        return new Promise((resolve, reject) => {
-            db.serialize(() => {
-                db.run("DELETE FROM schedule WHERE lesson_id=?", [id], function (err) {
-                    resolve(!(err));
-                });
-                if (!err) {
-                    db.run("DELETE FROM lesson_subgroup WHERE lesson_id=?", [id], function (err) {
-                        resolve(!(err));
-                    });
-                    if (!err) {
-                        db.run("DELETE FROM lesson WHERE id=?", [id], function (err) {
-                            console.log(id, "i am in db 1");
-                            resolve(!(err));
-                        });
-                    } else {
-                        console.log(id, "i am in db 2");
-                        resolve(false);
-                    }
-                }   
-            });
-        });
-        /*var deferred = q.defer();
-        db.run("DELETE FROM schedule WHERE lesson_id=?", [id], function(err){
-            if (!err) {
-                db.run("DELETE FROM lesson WHERE id=?", [id], function (err) {
-                    deferred.resolve(!(err));
-                });
-            } else {
-                deferred.resolve(false);
-            }
-        });
-        return deferred.promise;
-    };*/

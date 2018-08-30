@@ -86,7 +86,6 @@ function Journal(options) {
     };
 
     this.deleteUser = function(id) {
-        console.log(id, "4");
         return db.deleteUser(id);
     };
 
