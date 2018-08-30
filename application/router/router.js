@@ -27,10 +27,10 @@ function Router(options) {
         (+)  deleteLesson; // - дисциплина
         (+)  listOfLessons; // вывод списка дисциплин
 
-    //Schedule:    ПЕРЕПИСАТЬ НА НОВЫЙ СТАНДАРТ
+    //Schedule:    
         (+)  addSchedule; // + пара
         (+)  listOfSchedule; // вывод списка занятий
-        (+)  deleteSchedule; // - пара
+        (не хочу переписывать)  deleteSchedule; // - пара
 
     //Journal:      ПЕРЕПИСАТЬ ПОД НОВУЮ БД
         deleteNotes; // удалить отметки какого-то занятия
@@ -130,18 +130,21 @@ function Router(options) {
     router.get('/listOfUsers', async function(req, res) {
         res.send(await journal.listOfUsers());
     });
-
+  
     router.get('/deleteUser/:id', async function(req, res) {
         var id = req.params.id - 0;
+        console.log(id, "0");
         if (!isNaN(id)) {
+            console.log(id, "1");
             res.send(await journal.deleteUser(id));
+            console.log(id, "2");
         } else {
             res.send('not enough id parameter');
         }
+        console.log(id, "3");
     });
-
-//////////////////////////////////////WORKSPACE//////////////////////////////////////
-    
+  
+// SCHEDULE
     router.get('/addSchedule', async function(req, res) {
         var time = req.query.time;
         var day = req.query.day;
@@ -154,15 +157,12 @@ function Router(options) {
         }
     });
 
-    router.get('/listOfSchedule', function(req, res) {
-        journal.listOfSchedule().then(function (list) {
-            res.send(list);
-        });
+    router.get('/listOfSchedules', async function(req, res) {
+        res.send(await journal.listOfSchedules());
     });
 
 //////////////////////////////////////WORKSPACE//////////////////////////////////////
-
-// SCHEDULE
+   
     router.get('/deleteSchedule/:id', function(req, res) {
         var id = req.params.id - 0;
         if (!isNaN(id)) {
@@ -171,6 +171,8 @@ function Router(options) {
             res.send('not enough id parameter');
         }
     });
+ 
+//////////////////////////////////////WORKSPACE//////////////////////////////////////
 
 // OTHERS    
     // метод про ОТМЕТИТЬ студентов; пример строки - 1,0;2,1;3,0;4,1
@@ -208,7 +210,7 @@ function Router(options) {
             res.send('not enough parameters');
         }
     });
-
+  
     router.all('/*', function(req, res) {
         res.send('wrong way');
     });

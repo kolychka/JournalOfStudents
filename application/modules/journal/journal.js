@@ -86,6 +86,7 @@ function Journal(options) {
     };
 
     this.deleteUser = function(id) {
+        console.log(id, "4");
         return db.deleteUser(id);
     };
 
@@ -102,6 +103,10 @@ function Journal(options) {
         /*return db.addSchedule(time, day, lesson_id, subgroup_id).then(function() {
             return db.getSchedule(time, day, lesson_id, subgroup_id);
         });*/
+    };
+
+    this.listOfSchedules = function() {
+        return db.getListOfSchedules();
     };
 
 //////////////////////////////////////WORKSPACE//////////////////////////////////////

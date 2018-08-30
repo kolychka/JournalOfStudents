@@ -56,23 +56,21 @@ function DB() {
         });
     };
 
-    this.deleteStudent = function (id) {
+    this.deleteStudent = function (id) { // работает, но вариант старый
         return new Promise((resolve, reject) => {
-            db.serialize(() => {
-                db.run("DELETE FROM journal WHERE student_id=?", [id], function(err){
+            db.run("DELETE FROM journal WHERE student_id=?", [id], function(err){
+                if (!err) {
+                    db.run("DELETE FROM student_subgroup WHERE id=?", [id], function (err) {
+                        resolve(!(err));
+                    });
                     if (!err) {
-                        db.run("DELETE FROM student_subgroup WHERE id=?", [id], function (err) {
+                        db.run("DELETE FROM student WHERE id=?", [id], function (err) {
                             resolve(!(err));
                         });
-                        if (!err) {
-                            db.run("DELETE FROM student WHERE id=?", [id], function (err) {
-                                resolve(!(err));
-                            });
-                        } else {
-                            resolve(false);
-                        }
+                    } else {
+                        resolve(false);
                     }
-                });
+                }
             });
         });
     };  
@@ -125,9 +123,7 @@ function DB() {
         return deferred.promise;*/
     };
 
-    this.deleteLesson = async (id) => { 
-    this.deleteLesson = async (id) => { // хз, как сделать, чтобы все запросы выполнялись 
-        //только после запроса на удаление из журнала, 
+    this.deleteLesson = async (id) => { //работает 
         return new Promise(async(resolve, reject) => { 
             let result = false; 
             await db.run("DELETE FROM journal WHERE schedule_id = (SELECT id FROM schedule WHERE lesson_id=?)", [id], err => result = !err);
@@ -224,13 +220,10 @@ function DB() {
         });
     };
 
-    this.deleteUser = async (id) => { // удаляет из бд, но ответ на клиенте не светится
-        return new Promise(async(resolve, reject) => {
-            db.run("DELETE FROM user WHERE id=?", [id], (err, row) => { resolve((err) ? null : row); });
+    this.deleteUser = (id) => { 
+        return new Promise((resolve, reject) => {
+            db.run("DELETE FROM user WHERE id=?", [id], err => resolve(!err)); 
         });
-        /*let result = false;
-        await db.run("DELETE FROM user WHERE id=?", [id], err => result = !err); 
-        resolve(result); */
     };
 
 //////////////////////////////////////WORKSPACE//////////////////////////////////////
@@ -263,6 +256,14 @@ function DB() {
             deferred.resolve(!(err));
         });
         return deferred.promise;*/
+    };
+
+    this.getListOfSchedules = function() {
+        return new Promise((resolve, reject) => {
+            db.serialize(() => {
+                db.all("SELECT * FROM schedule", (err, row) => { resolve((err) ? null : row); });
+            });
+        });
     };
 
 //////////////////////////////////////WORKSPACE//////////////////////////////////////
