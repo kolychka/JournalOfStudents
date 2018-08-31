@@ -92,10 +92,6 @@ function Journal(options) {
         return db.deleteSchedule(id);
     };
 
-//////////////////////////////////////WORKSPACE//////////////////////////////////////
-
-//////////////////////////////////////WORKSPACE//////////////////////////////////////
-
 // OTHERS    
     this.noteStudents = function(noteList, schedule_id){
         var arr = noteList.split(';');

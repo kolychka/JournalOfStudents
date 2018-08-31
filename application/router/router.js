@@ -171,31 +171,25 @@ function Router(options) {
         }
     });
  
-//////////////////////////////////////WORKSPACE//////////////////////////////////////
-
-//////////////////////////////////////WORKSPACE//////////////////////////////////////
-
 // OTHERS    
     // метод про ОТМЕТИТЬ студентов; пример строки - 1,0;2,1;3,0;4,1
-    router.get('/noteStudents', function(req, res) {
+    router.get('/noteStudents', async function(req, res) {
         var noteList = req.query.noteList;
         var scheduleId = req.query.scheduleId;
         if (noteList && scheduleId) {
-            journal.noteStudents(noteList, scheduleId).then(function (result) {
-                res.send(result);
-            });
+            const result = await journal.noteStudents(noteList, scheduleId);
+            res.send((result) ? result : 'Вероятно, такая запись уже существует. Проверьте вводимые данные.');
         } else {
             res.send('not enough parameters');
         }
     });
 
-    router.get('/uploadData', function(req, res) {
+    router.get('/uploadData', async function(req, res) {
         var startDate = req.query.startDate;
         var finishDate = req.query.finishDate;
         if (startDate && finishDate && (startDate <= finishDate)) {
-            journal.uploadData(startDate, finishDate).then(function (data) {
-                res.send(data);
-            });
+            const result = await journal.uploadData(startDate, finishDate);
+            res.send((result) ? result : 'Вероятно, произошла ошибка. Проверьте вводимые данные.');
         } else  if (startDate && !finishDate) {
             var date = new Date();
             var values = [ date.getDate(), date.getMonth() + 1 ];
@@ -203,9 +197,8 @@ function Router(options) {
                 values[ id ] = values[ id ].toString().replace( /^([0-9])$/, '0$1' );
             }
             finishDate = date.getFullYear() + '-' + values[ 1 ] + '-' + values[ 0 ];
-            journal.uploadData(startDate, finishDate).then(function (data) {
-                res.send(data);
-            });
+            const result = journal.uploadData(startDate, finishDate);
+            res.send((result) ? result : 'Вероятно, произошла ошибка. Проверьте вводимые данные.');
         }
         else {
             res.send('not enough parameters');

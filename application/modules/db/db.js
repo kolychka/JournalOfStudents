@@ -1,4 +1,3 @@
-var q = require('q');
 var sqlite3 = require('sqlite3').verbose();
 
 function DB() {
@@ -218,10 +217,6 @@ function DB() {
         });
     };
 
-//////////////////////////////////////WORKSPACE//////////////////////////////////////
-
-//////////////////////////////////////WORKSPACE//////////////////////////////////////
-
 // OTHERS    
     this.noteStudents = function (studentsList, schedule_id) {
         return new Promise(function(resolve, reject) {
@@ -246,24 +241,24 @@ function DB() {
     };
 
     this.getUploadData = function(startDate, finishDate) {
-        var deferred = q.defer();
-        db.serialize(function () {
-            var query = "SELECT student.name, " + 
-                                "student.lastname, " + 
-                                "student.surname, " + 
-                                "journal.status, " + 
-                                "schedule.day, " + 
-                                "schedule.time, " + 
-                                "lesson.name AS lessonName, " + 
-                                "subgroup.name AS subgroupName " +
-                        "FROM student " +
-                            "INNER JOIN journal on student.id = journal.student_id " +
-                            "INNER JOIN schedule on schedule.id = journal.schedule_id AND schedule.day BETWEEN '" + startDate + "' AND '" + finishDate + "' " +
-                            "INNER JOIN lesson on lesson.id = schedule.lesson_id " + 
-                            "INNER JOIN subgroup on subgroup.id = schedule.subgroup_id";
-                db.all(query, function (err, row) { console.log(err, row); deferred.resolve((err) ? null : row); });
+        return new Promise((resolve, reject) => {
+            db.serialize(function () {
+                var query = "SELECT student.name, " + 
+                                    "student.lastname, " + 
+                                    "student.surname, " + 
+                                    "journal.status, " + 
+                                    "schedule.day, " + 
+                                    "schedule.time, " + 
+                                    "lesson.name AS lessonName, " + 
+                                    "subgroup.name AS subgroupName " +
+                            "FROM student " +
+                                "INNER JOIN journal on student.id = journal.student_id " +
+                                "INNER JOIN schedule on schedule.id = journal.schedule_id AND schedule.day BETWEEN '" + startDate + "' AND '" + finishDate + "' " +
+                                "INNER JOIN lesson on lesson.id = schedule.lesson_id " + 
+                                "INNER JOIN subgroup on subgroup.id = schedule.subgroup_id";
+                    db.all(query, (err, row) => { resolve((err) ? null : row); });
+            });
         });
-        return deferred.promise;
     };
 
     this.deinit = function () {
