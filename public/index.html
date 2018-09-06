@@ -14,9 +14,9 @@
 <body>
     <div id="headers">
         <div class="head" data-page-name="journal"><button type="button" class="btn btn-light headBtns">Отметить студентов</button></div>
-        <div class="head" data-page-name="schedule"><button type="button" class="btn btn-light headBtns">Расписание занятий</button></div>
-        <div class="head" data-page-name="students"><button type="button" class="btn btn-light headBtns">Удалить/Добавить студента(-ов)</button></div>
-        <div class="head" data-page-name="lesson"><button type="button" class="btn btn-light headBtns">Удалить/Добавить дисциплину</button></div>
+        <div class="head" data-page-name="schedule"><button type="button" class="btn btn-light headBtns">Управление занятиями</button></div>
+        <div class="head" data-page-name="students"><button type="button" class="btn btn-light headBtns">Управление студентами</button></div>
+        <div class="head" data-page-name="lesson"><button type="button" class="btn btn-light headBtns">Управление дисциплинами</button></div>
     </div>
     <div id="pages">
         <!-- страница отмечания -->
@@ -33,8 +33,14 @@
             <div class="add-student">
                 <h4 id="student">Добавить студента</h4>
                 <input class="form-control" id="student_name" placeholder="Имя" type="text">
-                <input class="form-control" id="student_surname" placeholder="Фамилия и инициалы" type="text">
-                <input class="form-control" id="student_subgroup" placeholder="Подгруппа" type="text">
+                <input class="form-control" id="student_surname" placeholder="Отчество" type="text">
+                <input class="form-control" id="student_subgroup" placeholder="Фамилия" type="text">
+                <select class="custom-select studentsInputs" id="student-select">
+                    <option value="1">Учится</option>
+                    <option value="2">Находится в академическом отпуске</option>
+                    <option value="3">Отчислен</option>
+                </select>
+                <input class="form-control" id="student_subgroup" placeholder="Номер зачётной книжки" type="text">
                 <input class="confirmBtns btn btn-light" id="student_button" type="button" value="Добавить">
             </div>
         </div>

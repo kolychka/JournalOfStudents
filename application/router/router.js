@@ -10,16 +10,16 @@ function Router(options) {
     //User:
         (+)  addUser; // + пользователь
         (+)  listOfUsers; // вывод списка пользователей
-        (сломан)  deleteUser; // - пользователь
+        (+)  deleteUser; // - пользователь
 
     //Subgroup:
         (+)  addSubgroup; // + подгруппа
-        (сломан)  deleteSubgroup; // - подгруппа
+        (+)  deleteSubgroup; // - подгруппа
         (+)  listOfSubgroups; // вывод списка подгрупп
 
     //Student:
         (+)  addStudent; // + студент
-        (старый)  deleteStudent; // - студент
+        (+)  deleteStudent; // - студент
         (+)  listOfStudents; // вывод списка студентов
 
     //Lesson:
@@ -30,12 +30,12 @@ function Router(options) {
     //Schedule:    
         (+)  addSchedule; // + пара
         (+)  listOfSchedule; // вывод списка занятий
-        (не хочу переписывать)  deleteSchedule; // - пара
+        (+)  deleteSchedule; // - пара
 
-    //Journal:      ПЕРЕПИСАТЬ ПОД НОВУЮ БД
-        deleteNotes; // удалить отметки какого-то занятия
-        noteStudents; // отметить студентов
-        uploadData; // выгрузить данные attendance
+    //Journal: 
+        (-)  deleteNotes; // удалить отметки какого-то занятия
+        (+)  noteStudents; // отметить студентов
+        (+)  uploadData; // выгрузить данные attendance
     */
 
 // STUDENT

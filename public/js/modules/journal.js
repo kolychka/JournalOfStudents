@@ -12,25 +12,28 @@ function Journal(server) {
                         /*'<span>' + result[i].surname + '</span>' +
                         '<input class="note-student" type="checkbox" data-id="' + result[i].id + '"/>' +
                         '</div>' + */
-                        '<div class="input-group">' +
-                        '<div class="input-group-prepend">' +
-                        '<div class="input-group-text">' +
-                        '<input class="note-student" type="checkbox" data-id="' + result[i].id +'" aria-label="Radio button for following text input">' +
-                        '</div>' +
-                        '</div>' +
-                        '<input type="text" class="form-control" value="' + result[i].surname + '">' +
-                        '</div>' +
+                            '<div class="input-group">' +
+                                '<div class="input-group-prepend">' +
+                                    '<div class="input-group-text">' +
+                                        '<input class="note-student" type="checkbox" data-id="' + result[i].id +
+                                        '" aria-label="Radio button for following text input">' +
+                                    '</div>' +
+                                '</div>' +
+                                '<input type="text" class="form-control" value="' + result[i].lastname + '">' +
+                            '</div>' +
                         '</div>';
                 }
                 $('.note-students').html(str);
             }
         });
         // получить расписание и положить его в выпадашку
-        server.listOfSchedule(function (result) {
+        server.listOfSchedules(function (result) {
             if (result && result.length) {
                 var str = '';
                 for (var i = 0; i < result.length; i++) {
-                    str += '<option value="'+ result[i].scheduleId + '">' + result[i].day + '&nbsp;' + result[i].time  + '&nbsp;' + result[i].name + '</option>';
+                    str += '<option value="'+ result[i].scheduleId + '">' + result[i].scheduleDay + 
+                                '&nbsp;' + result[i].scheduleTime  + '&nbsp;' + result[i].lessonName  + 
+                                '&nbsp;' + result[i].subgroupName + '</option>';
                 }
                 $('#schedule-select').html(str);
             }
