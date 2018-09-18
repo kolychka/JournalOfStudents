@@ -27,7 +27,7 @@ function DB() {
         });
     };
 
-    this.deleteStudent = (id) => { // работает, но вариант старый
+    this.deleteStudent = (id) => { 
         return new Promise((resolve, reject) => {
             db.run("DELETE FROM journal WHERE student_id=?" , [id], err => { 
                 (!err) ? 
@@ -65,7 +65,7 @@ function DB() {
         });
     };
 
-    this.deleteLesson = (id) => { //работает 
+    this.deleteLesson = (id) => { 
         return new Promise((resolve, reject) => { 
             db.run("DELETE FROM journal WHERE schedule_id = (SELECT id FROM schedule WHERE lesson_id=?)", [id], err => {
                 (!err) ? 
@@ -148,7 +148,7 @@ function DB() {
         }); 
     };
 
-    this.addUser = function (role, name, login, password) {
+    this.addUser = (role, name, login, password) => {
         return new Promise((resolve,reject) => {
             const query = "INSERT INTO user (role, name, login, password) VALUES (?, ?, ?, ?)";
             db.run(query, [role, name, login, password], function (err) {
@@ -157,7 +157,7 @@ function DB() {
         });
     };
 
-    this.getListOfUsers = function() {
+    this.getListOfUsers = () => {
         return new Promise((resolve, reject) => {
             db.serialize(() => {
                 db.all("SELECT * FROM user", (err, row) => { resolve((err) ? null : row); });
@@ -205,7 +205,7 @@ function DB() {
         });
     };
 
-    this.deleteSchedule = function (id) {
+    this.deleteSchedule = (id) => {
         return new Promise((resolve, reject) => {
             db.run("DELETE FROM journal WHERE schedule_id=?", [id], err => {
                 (!err) ?
@@ -218,7 +218,7 @@ function DB() {
     };
 
 // OTHERS    
-    this.noteStudents = function (studentsList, schedule_id) {
+    this.noteStudents = (studentsList, schedule_id) => {
         return new Promise(function(resolve, reject) {
             if (studentsList && studentsList.length && schedule_id) {
                 str = [];
@@ -240,7 +240,7 @@ function DB() {
         });
     };
 
-    this.getUploadData = function(startDate, finishDate) {
+    this.getUploadData = (startDate, finishDate) => {
         return new Promise((resolve, reject) => {
             db.serialize(function () {
                 var query = "SELECT student.name, " + 
@@ -253,7 +253,10 @@ function DB() {
                                     "subgroup.name AS subgroupName " +
                             "FROM student " +
                                 "INNER JOIN journal on student.id = journal.student_id " +
-                                "INNER JOIN schedule on schedule.id = journal.schedule_id AND schedule.day BETWEEN '" + startDate + "' AND '" + finishDate + "' " +
+                                "INNER JOIN schedule on schedule.id = journal.schedule_id AND schedule.day BETWEEN '" + 
+                                    startDate + 
+                                    "' AND '" + 
+                                    finishDate + "' " +
                                 "INNER JOIN lesson on lesson.id = schedule.lesson_id " + 
                                 "INNER JOIN subgroup on subgroup.id = schedule.subgroup_id";
                     db.all(query, (err, row) => { resolve((err) ? null : row); });
@@ -261,14 +264,13 @@ function DB() {
         });
     };
 
-    this.deinit = function () {
+    this.deinit = () => {
         if (db) {
             db.close();
             db = null;
         }
     };
 
-    // init
     function init() {
         db = new sqlite3.Database(__dirname + '\\journal.db');
     }

@@ -32,15 +32,15 @@
             <!-- добавление студентов -->
             <div class="add-student">
                 <h4 id="student">Добавить студента</h4>
+                <input class="form-control" id="student_lastname" placeholder="Фамилия" type="text">
                 <input class="form-control" id="student_name" placeholder="Имя" type="text">
                 <input class="form-control" id="student_surname" placeholder="Отчество" type="text">
-                <input class="form-control" id="student_subgroup" placeholder="Фамилия" type="text">
                 <select class="custom-select studentsInputs" id="student-select">
                     <option value="1">Учится</option>
                     <option value="2">Находится в академическом отпуске</option>
                     <option value="3">Отчислен</option>
                 </select>
-                <input class="form-control" id="student_subgroup" placeholder="Номер зачётной книжки" type="text">
+                <input class="form-control" id="student_record_book" placeholder="Номер зачётной книжки" type="text">
                 <input class="confirmBtns btn btn-light" id="student_button" type="button" value="Добавить">
             </div>
         </div>
@@ -62,6 +62,8 @@
                     <option value="7">7 пара (19:00)</option>
                 </select>
                 <select class="custom-select scheduleInputs" id="lesson-select">
+                </select>
+                <select class="custom-select scheduleInputs" id="subgroup-select">
                 </select>
                 <input class="confirmBtns btn btn-light" id="schedule_button" type="button" value="Добавить">
             </div>

@@ -10,17 +10,14 @@ function Lesson(server) {
                 console.log(result);
                 for (var i = 0; i < result.length; i++) {
                     str += '<div class="lesson-item" data-id="' + result[i].id + '">' +
-                        /*'<span>' + result[i].name + '</span>' +
-                        '<input class="delete-lesson" type="button" value="Удалить" data-id="' + result[i].id + '" />' +
-                        '</div>' +*/
-                            '<div class="input-group mb-3">' +
-                                '<div class="input-group-prepend">' +
-                                '<input class="btn btn-outline-secondary delete-lesson" type="button" value="Удалить" data-id="' + result[i].id + '"/>' +
+                                '<div class="input-group mb-3">' +
+                                    '<div class="input-group-prepend">' +
+                                        '<input class="btn btn-outline-secondary delete-lesson" type="button" value="Удалить" data-id="' + result[i].id + '"/>' +
+                                    '</div>' +
+                                    '<input type="text" class="form-control" placeholder="" aria-label="" aria-describedby="basic-addon1" value="' +
+                                    ' ' + result[i].name + ' ' + '"/>' +
                                 '</div>' +
-                                '<input type="text" class="form-control" placeholder="" aria-label="" aria-describedby="basic-addon1" value="' +
-                                ' ' + result[i].name + ' ' + '"/>' +
-                            '</div>' +
-                        '</div>';
+                            '</div>';
                 }
                 $('.list-of-lessons').html(str);
                 // кнопка удаления дисциплины

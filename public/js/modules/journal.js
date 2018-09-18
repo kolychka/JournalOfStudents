@@ -9,19 +9,16 @@ function Journal(server) {
                 var str = '';
                 for (var i = 0; i < result.length; i++) {
                     str += '<div class="journal-item">' +
-                        /*'<span>' + result[i].surname + '</span>' +
-                        '<input class="note-student" type="checkbox" data-id="' + result[i].id + '"/>' +
-                        '</div>' + */
-                            '<div class="input-group">' +
-                                '<div class="input-group-prepend">' +
-                                    '<div class="input-group-text">' +
-                                        '<input class="note-student" type="checkbox" data-id="' + result[i].id +
-                                        '" aria-label="Radio button for following text input">' +
+                                '<div class="input-group">' +
+                                    '<div class="input-group-prepend">' +
+                                        '<div class="input-group-text">' +
+                                            '<input class="note-student" type="checkbox" data-id="' + result[i].id +
+                                            '" aria-label="Radio button for following text input">' +
+                                        '</div>' +
                                     '</div>' +
+                                    '<input type="text" class="form-control" value="' + result[i].lastname + '">' +
                                 '</div>' +
-                                '<input type="text" class="form-control" value="' + result[i].lastname + '">' +
-                            '</div>' +
-                        '</div>';
+                            '</div>';
                 }
                 $('.note-students').html(str);
             }

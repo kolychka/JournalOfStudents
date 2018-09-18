@@ -8,18 +8,14 @@ function Schedule(server) {
                 var str = '';
                 for (var i = 0; i < result.length; i++) {
                     str += '<div class="schedule-item" data-id="' + result[i].scheduleId + '">' +
-                        /*'<span>' + result[i].day + '</span>&nbsp;<span>' + result[i].time + '&nbsp;пара</span>' +
-                        '&nbsp;<span>' + result[i].name + '</span>' +
-                        '<input class="delete-in-schedule" type="button" value="Удалить" data-id="' + result[i].scheduleId + '" />' +
-                    '</div>' +*/
-                            '<div class="input-group mb-3">' +
-                                '<div class="input-group-prepend">' +
-                                    '<input class="btn btn-outline-secondary delete-in-schedule" type="button" value="Удалить" data-id="' + result[i].scheduleId + '"/>' +
+                                '<div class="input-group mb-3">' +
+                                    '<div class="input-group-prepend">' +
+                                        '<input class="btn btn-outline-secondary delete-in-schedule" type="button" value="Удалить" data-id="' + result[i].scheduleId + '"/>' +
+                                    '</div>' +
+                                    '<input type="text" class="form-control" placeholder="" aria-label="" aria-describedby="basic-addon1" value="' +
+                                    ' ' + result[i].scheduleDay + '; ' + result[i].scheduleTime + ' пара; ' + result[i].lessonName + '; ' + result[i].subgroupName + ' ' + '"/>' +
                                 '</div>' +
-                                '<input type="text" class="form-control" placeholder="" aria-label="" aria-describedby="basic-addon1" value="' +
-                                ' ' + result[i].scheduleDay + '; ' + result[i].scheduleTime + ' пара; ' + result[i].lessonName + '; ' + result[i].subgroupName + ' ' + '"/>' +
-                            '</div>' +
-                        '</div>';
+                            '</div>';
                 }
                 $('.list-of-schedule').html(str);
                 // кнопка удаления занятия
@@ -42,6 +38,15 @@ function Schedule(server) {
                 $('#lesson-select').html(str);
             }
         });
+        server.listOfSubgroups(function(result){
+            if (result && result.length) {
+                var str = '';
+                for (var i = 0; i < result.length; i++) {
+                    str += '<option value="'+ result[i].id + '">' + result[i].name + " " + result[i].description + " " + result[i].group_code + '</option>';
+                }
+                $('#subgroup-select').html(str);
+            }
+        });
     };
 
     function init() {
@@ -50,7 +55,7 @@ function Schedule(server) {
             var time = $('#lesson-time-select').val();
             var lesson_name = $('#lesson-select').val();
             var subgroup_name = $('#subgroup-select').val();
-            if (day && time && name) {
+            if (day && time && lesson_name && subgroup_name) {
                 server.addSchedule(time, day, lesson_name, subgroup_name, self.show);
             } else {
                 console.log('В расписание не добавлено.');

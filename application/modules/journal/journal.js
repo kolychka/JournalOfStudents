@@ -3,7 +3,7 @@ function Journal(options) {
     var db = options.db;
 
 // STUDENT  
-    this.addStudent = async function(name, surname, lastname, record_book, status) {
+    this.addStudent = async (name, surname, lastname, record_book, status) => {
         var result = await db.addStudent(name, surname, lastname, record_book, status);
         if (result) {
             return await db.getStudent(name, record_book);
@@ -12,16 +12,16 @@ function Journal(options) {
         }
     };
 
-    this.listOfStudents = function() {
+    this.listOfStudents = () => {
         return db.getListOfStudents();
     };
 
-    this.deleteStudent = function(id) {
+    this.deleteStudent = (id) => {
         return db.deleteStudent(id);
     };
 
 // LESSON
-    this.addLesson = async function(name) {
+    this.addLesson = async (name) => {
         var result = await db.addLesson(name);
         if (result) {
             return await db.getLesson(name);
@@ -30,16 +30,16 @@ function Journal(options) {
         }
     };
 
-    this.listOfLessons = function() {
+    this.listOfLessons = () => {
         return db.getListOfLessons();
     };
 
-    this.deleteLesson = function(id) {
+    this.deleteLesson = (id) => {
         return db.deleteLesson(id);
     };
 
 // SUBGROUP 
-    this.addSubgroup = async function(name, description, group_code) {
+    this.addSubgroup = async (name, description, group_code) => {
         var result = await db.addSubgroup(name,description, group_code);
         if (result) {
             return await db.getSubgroup(name, description, group_code);
@@ -48,16 +48,16 @@ function Journal(options) {
         }
     };
 
-    this.listOfSubgroups = function() {
+    this.listOfSubgroups = () => {
         return db.getListOfSubgroups();
     };
 
-    this.deleteSubgroup = function(id) {
+    this.deleteSubgroup = (id) => {
         return db.deleteSubgroup(id);
     };
 
 // USER
-    this.addUser = async function(role, name, login, password) {
+    this.addUser = async (role, name, login, password) => {
         var result = await db.addUser(role, name, login, password);
         if (result) {
             return await db.getUser(role, name);
@@ -66,16 +66,16 @@ function Journal(options) {
         }
     };
 
-    this.listOfUsers = function() {
+    this.listOfUsers = () => {
         return db.getListOfUsers();
     };
 
-    this.deleteUser = function(id) {
+    this.deleteUser = (id) => {
         return db.deleteUser(id);
     };
 
 // SCHEDULE
-    this.addSchedule = async function(time, day, lesson_id, subgroup_id) {
+    this.addSchedule = async (time, day, lesson_id, subgroup_id) => {
         var result = await db.addSchedule(time, day, lesson_id, subgroup_id);
         if (result) {
             return await db.getSchedule(time, day, lesson_id, subgroup_id);
@@ -84,16 +84,16 @@ function Journal(options) {
         }
     };
 
-    this.listOfSchedules = function() {
+    this.listOfSchedules = () => {
         return db.getListOfSchedules();
     };
 
-    this.deleteSchedule = function(id) {
+    this.deleteSchedule = (id) => {
         return db.deleteSchedule(id);
     };
 
 // OTHERS    
-    this.noteStudents = function(noteList, schedule_id){
+    this.noteStudents = (noteList, schedule_id) => {
         var arr = noteList.split(';');
         var res = [];
         if (arr instanceof Array) {
@@ -107,7 +107,7 @@ function Journal(options) {
         return db.noteStudents(res, schedule_id);
     };
 
-    this.uploadData = function(startDate, finishDate) {
+    this.uploadData = (startDate, finishDate) => {
         return db.getUploadData(startDate, finishDate);
     };
 }
