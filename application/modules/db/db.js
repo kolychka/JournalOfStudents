@@ -19,10 +19,17 @@ function DB() {
         });
     };
 
-    this.updateStudent = (id, name, surname, lastname, record_book, status) => {
+    this.updateStudent = (id, params) => {
         return new Promise((resolve,reject) => {
-            const query = "UPDATE student SET name = ?, surname = ?, lastname = ?, record_book = ?, status = ? WHERE id = ?";
-            db.run(query, [name, surname, lastname, record_book, status, id], err => resolve(!err));
+            var str = [];
+            var arr =[];
+            for (let par in params) {
+                str.push(par + " = ?");
+                arr.push(params[par]);
+            }
+            arr.push(id);
+            const query = "UPDATE student SET " + str.join(', ') + " WHERE id = ?";
+            db.run(query, arr, err => resolve(!err));
         });
     };
 

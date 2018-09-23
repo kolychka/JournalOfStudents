@@ -12,8 +12,8 @@ function Router(options) {
         var name = req.query.name;
         var surname = req.query.surname;
         var lastname = req.query.lastname;
-        var record_book = req.query.record_book;
-        var status = req.query.status;
+        var record_book = req.query.record_book - 0;
+        var status = req.query.status - 0;
         if (name && record_book) {
             const result = await journal.addStudent(name, surname, lastname, record_book, status);
             res.send((result) ? result : 'Вероятно, такая запись уже существует. Проверьте вводимые данные.');
@@ -27,14 +27,30 @@ function Router(options) {
         var name = req.query.name;
         var surname = req.query.surname;
         var lastname = req.query.lastname;
-        var record_book = req.query.record_book;
-        var status = req.query.status;
-            if (!isNaN(id) && name && record_book && status) {
-                const result = await journal.updateStudent(id, name, surname, lastname, record_book, status);
-                res.send((result) ? result : 'Вероятно, такая запись уже существует. Проверьте вводимые данные.');
-            } else {
-                res.send('not enough parameters');
-            }
+        var record_book = req.query.record_book - 0;
+        var status = req.query.status - 0;
+        var params = {};
+        if (name && name.length && isNaN(name)) {
+            params.name = name;
+        }
+        if (surname && surname.length && isNaN(surname)) {
+            params.surname = surname;
+        }
+        if (lastname && lastname.length && isNaN(lastname)) {
+            params.lastname = lastname;
+        }
+        if (record_book && !isNaN(record_book)) {
+            params.record_book = record_book;
+        }
+        if (status && !isNaN(status)) {
+            params.status = status;
+        }
+        if (!isNaN(id) && params) {
+            const result = await journal.updateStudent(id, params);
+            res.send((result) ? result : 'Вероятно, такая запись уже существует. Проверьте вводимые данные.');
+        } else {
+            res.send('not enough parameters');
+        }
     });
 
     router.get('/listOfStudents', async (req, res) => {
@@ -126,7 +142,7 @@ function Router(options) {
 
 // USER
     router.get('/addUser', async (req, res) => {
-        var role = req.query.role;
+        var role = req.query.role - 0;
         var name = req.query.name;
         var login = req.query.login;
         var password = req.query.password;
@@ -141,7 +157,7 @@ function Router(options) {
  
     router.get('/updateUser', async (req, res) => {
         var id = req.query.id - 0;
-        var role = req.query.role;
+        var role = req.query.role - 0;
         var name = req.query.name;
         var login = req.query.login;
         var password = req.query.password;
@@ -168,7 +184,7 @@ function Router(options) {
   
 // SCHEDULE
     router.get('/addSchedule', async (req, res) => {
-        var time = req.query.time;
+        var time = req.query.time - 0;
         var day = req.query.day;
         var lesson_id = req.query.lesson_id - 0;
         var subgroup_id = req.query.subgroup_id - 0;
@@ -182,7 +198,7 @@ function Router(options) {
 
     router.get('/updateSchedule', async (req, res) => {
         var id = req.query.id - 0;
-        var time = req.query.time;
+        var time = req.query.time - 0;
         var day = req.query.day;
         var lesson_id = req.query.lesson_id - 0;
         var subgroup_id = req.query.subgroup_id - 0;
@@ -210,8 +226,8 @@ function Router(options) {
 // OTHERS    
     router.get('/noteStudents', async (req, res) => {
         var noteList = req.query.noteList; // пример строки - 1,0;2,1;3,0;4,1
-        var scheduleId = req.query.scheduleId;
-        if (noteList && scheduleId) {
+        var scheduleId = req.query.scheduleId - 0;
+        if (noteList && !isNaN(scheduleId)) {
             const result = await journal.noteStudents(noteList, scheduleId);
             res.send((result) ? result : 'Вероятно, такая запись уже существует. Проверьте вводимые данные.');
         } else {

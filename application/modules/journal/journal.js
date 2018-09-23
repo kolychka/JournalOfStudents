@@ -12,10 +12,10 @@ function Journal(options) {
         }
     };
   
-    this.updateStudent = async (id, name, surname, lastname, record_book, status) => {
-        var result = await db.updateStudent(id, name, surname, lastname, record_book, status);
+    this.updateStudent = async (id, params) => {
+        var result = await db.updateStudent(id, params);
         if (result) {
-            return await db.getStudent(name, record_book);
+            return await db.getStudent(params.name, params.record_book);
         } else {
             return null;
         }
