@@ -22,6 +22,21 @@ function Router(options) {
         }
     });
 
+    router.get('/updateStudent', async (req, res) => {
+        var id = req.query.id - 0;
+        var name = req.query.name;
+        var surname = req.query.surname;
+        var lastname = req.query.lastname;
+        var record_book = req.query.record_book;
+        var status = req.query.status;
+            if (!isNaN(id) && name && record_book && status) {
+                const result = await journal.updateStudent(id, name, surname, lastname, record_book, status);
+                res.send((result) ? result : 'Вероятно, такая запись уже существует. Проверьте вводимые данные.');
+            } else {
+                res.send('not enough parameters');
+            }
+    });
+
     router.get('/listOfStudents', async (req, res) => {
         res.send(await journal.listOfStudents());
     });
@@ -45,7 +60,18 @@ function Router(options) {
             res.send('not enough parameter');
         }
     });
- 
+
+    router.get('/updateLesson', async (req, res) => {
+        var id = req.query.id - 0;
+        var name = req.query.name;
+        if (!isNaN(id) && name) {
+            const result = await journal.updateLesson(id, name);
+            res.send((result) ? result : 'Вероятно, такая запись уже существует. Проверьте вводимые данные.');
+        } else {
+            res.send('not enough parameter');
+        }
+    });
+
     router.get('/listOfLessons', async (req, res) => {
         res.send(await journal.listOfLessons());
     });
@@ -71,7 +97,20 @@ function Router(options) {
             res.send('not enough parameters');
         }
     });
-    
+ 
+    router.get('/updateSubgroup', async (req, res) => {
+        var id = req.query.id - 0;
+        var name = req.query.name;
+        var description = req.query.description;
+        var group_code = req.query.group_code;
+        if (!isNaN(id) && name) {
+            const result = await journal.updateSubgroup(id, name, description, group_code);
+            res.send((result) ? result : 'Вероятно, такая запись уже существует. Проверьте вводимые данные.');
+        } else {
+            res.send('not enough parameters');
+        }
+    });
+  
     router.get('/listOfSubgroups', async (req, res) => {
         res.send(await journal.listOfSubgroups());
     });
@@ -99,6 +138,20 @@ function Router(options) {
             res.send('not enough parameters');
         }
     });
+ 
+    router.get('/updateUser', async (req, res) => {
+        var id = req.query.id - 0;
+        var role = req.query.role;
+        var name = req.query.name;
+        var login = req.query.login;
+        var password = req.query.password;
+        if (!isNaN(id) && role && name && login && password) {
+            const result = await journal.updateUser(id, role, name, login, password);
+            res.send((result) ? result : 'Вероятно, такая запись уже существует. Проверьте вводимые данные.');
+        } else {
+            res.send('not enough parameters');
+        }
+    });
     
     router.get('/listOfUsers', async (req, res) => {
         res.send(await journal.listOfUsers());
@@ -121,6 +174,20 @@ function Router(options) {
         var subgroup_id = req.query.subgroup_id - 0;
         if (!isNaN(time) && day && !isNaN(lesson_id) && !isNaN(subgroup_id)) {
             const result = await journal.addSchedule(time, day, lesson_id, subgroup_id);
+            res.send((result) ? result : 'Вероятно, такая запись уже существует. Проверьте вводимые данные.');
+        } else {
+            res.send('not enough parameters');
+        }
+    });
+
+    router.get('/updateSchedule', async (req, res) => {
+        var id = req.query.id - 0;
+        var time = req.query.time;
+        var day = req.query.day;
+        var lesson_id = req.query.lesson_id - 0;
+        var subgroup_id = req.query.subgroup_id - 0;
+        if (!isNaN(id) && !isNaN(time) && day && !isNaN(lesson_id) && !isNaN(subgroup_id)) {
+            const result = await journal.updateSchedule(id, time, day, lesson_id, subgroup_id);
             res.send((result) ? result : 'Вероятно, такая запись уже существует. Проверьте вводимые данные.');
         } else {
             res.send('not enough parameters');

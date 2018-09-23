@@ -11,6 +11,15 @@ function Journal(options) {
             return null;
         }
     };
+  
+    this.updateStudent = async (id, name, surname, lastname, record_book, status) => {
+        var result = await db.updateStudent(id, name, surname, lastname, record_book, status);
+        if (result) {
+            return await db.getStudent(name, record_book);
+        } else {
+            return null;
+        }
+    };
 
     this.listOfStudents = () => {
         return db.getListOfStudents();
@@ -30,6 +39,15 @@ function Journal(options) {
         }
     };
 
+    this.updateLesson = async (id, name) => {
+        var result = await db.updateLesson(id, name);
+        if (result) {
+            return await db.getLesson(name);
+        } else {
+            return null;
+        }
+    };
+
     this.listOfLessons = () => {
         return db.getListOfLessons();
     };
@@ -40,7 +58,16 @@ function Journal(options) {
 
 // SUBGROUP 
     this.addSubgroup = async (name, description, group_code) => {
-        var result = await db.addSubgroup(name,description, group_code);
+        var result = await db.addSubgroup(name, description, group_code);
+        if (result) {
+            return await db.getSubgroup(name, description, group_code);
+        } else {
+            return null;
+        }
+    };
+
+    this.updateSubgroup = async (id, name, description, group_code) => {
+        var result = await db.updateSubgroup(id, name, description, group_code);
         if (result) {
             return await db.getSubgroup(name, description, group_code);
         } else {
@@ -66,6 +93,15 @@ function Journal(options) {
         }
     };
 
+    this.updateUser = async (id, role, name, login, password) => {
+        var result = await db.updateUser(id, role, name, login, password);
+        if (result) {
+            return await db.getUser(role, name);
+        } else {
+            return null;
+        }
+    };
+
     this.listOfUsers = () => {
         return db.getListOfUsers();
     };
@@ -77,6 +113,15 @@ function Journal(options) {
 // SCHEDULE
     this.addSchedule = async (time, day, lesson_id, subgroup_id) => {
         var result = await db.addSchedule(time, day, lesson_id, subgroup_id);
+        if (result) {
+            return await db.getSchedule(time, day, lesson_id, subgroup_id);
+        } else {
+            return null;
+        }
+    };
+
+    this.updateSchedule = async (id, time, day, lesson_id, subgroup_id) => {
+        var result = await db.updateSchedule(id, time, day, lesson_id, subgroup_id);
         if (result) {
             return await db.getSchedule(time, day, lesson_id, subgroup_id);
         } else {

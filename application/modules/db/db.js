@@ -19,6 +19,13 @@ function DB() {
         });
     };
 
+    this.updateStudent = (id, name, surname, lastname, record_book, status) => {
+        return new Promise((resolve,reject) => {
+            const query = "UPDATE student SET name = ?, surname = ?, lastname = ?, record_book = ?, status = ? WHERE id = ?";
+            db.run(query, [name, surname, lastname, record_book, status, id], err => resolve(!err));
+        });
+    };
+
     this.getListOfStudents = () => {
         return new Promise((resolve, reject) => {
             db.serialize(() => {
@@ -54,6 +61,13 @@ function DB() {
     this.addLesson = (name) => {
         return new Promise((resolve, reject) => {
             db.run("INSERT INTO lesson (name) VALUES (?)", [name], err => resolve(!err));
+        });
+    };
+
+    this.updateLesson = (id, name) => {
+        return new Promise((resolve,reject) => {
+            const query = "UPDATE lesson SET name = ? WHERE id = ?";
+            db.run(query, [name, id], err => resolve(!err));
         });
     };
 
@@ -103,6 +117,13 @@ function DB() {
         return new Promise((resolve, reject) => {
             const query = "INSERT INTO subgroup (name, description, group_code) VALUES (?, ?, ?)";
             db.run(query, [name, description, group_code], err => resolve(!err));
+        });
+    };
+
+    this.updateSubgroup = (id, name, description, group_code) => {
+        return new Promise((resolve, reject) => {
+            const query = "UPDATE subgroup SET name = ?, description = ?, group_code = ? WHERE id = ?";
+            db.run(query, [name, description, group_code, id], err => resolve(!err));
         });
     };
 
@@ -157,6 +178,15 @@ function DB() {
         });
     };
 
+    this.updateUser = (id, role, name, login, password) => {
+        return new Promise((resolve,reject) => {
+            const query = "UPDATE user SET role = ?, name = ?, login = ?, password = ? WHERE id = ?";
+            db.run(query, [role, name, login, password, id], function (err) {
+                resolve(!(err));
+            });
+        });
+    };
+
     this.getListOfUsers = () => {
         return new Promise((resolve, reject) => {
             db.serialize(() => {
@@ -185,6 +215,13 @@ function DB() {
         return new Promise((resolve, reject) => {
             const query = "INSERT INTO schedule (time, day, lesson_id, subgroup_id) VALUES (?, ?, ?, ?)";
             db.run(query, [time, day, lesson_id, subgroup_id], err => resolve(!err));
+        });
+    };
+
+    this.updateSchedule = (id, time, day, lesson_id, subgroup_id) => {
+        return new Promise((resolve, reject) => {
+            const query = "UPDATE schedule SET time = ?, day = ?, lesson_id = ?, subgroup_id = ? WHERE id = ?";
+            db.run(query, [time, day, lesson_id, subgroup_id, id], err => resolve(!err));
         });
     };
 
