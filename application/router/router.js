@@ -22,35 +22,25 @@ function Router(options) {
         }
     });
 
-    router.get('/updateStudent', async (req, res) => {
-        var id = req.query.id - 0;
-        var name = req.query.name;
-        var surname = req.query.surname;
-        var lastname = req.query.lastname;
-        var record_book = req.query.record_book - 0;
-        var status = req.query.status - 0;
-        var params = {};
-        if (name && name.length && isNaN(name)) {
-            params.name = name;
+    router.get('/updateStudent', async (req, res) => { 
+        var id = req.query.id - 0; 
+        var name = (req.query.name) ? req.query.name : null; 
+        var surname = (req.query.surname) ? req.query.surname : null; 
+        var lastname = (req.query.lastname) ? req.query.lastname : null; 
+        var record_book = (req.query.record_book - 0) ? (req.query.record_book - 0) : null; 
+        var status = (req.query.status - 0) ? (req.query.status - 0) : null; 
+        var params = { name, surname, lastname, record_book, status };
+        for (let key in params) {
+            if (!params[key]) {
+                delete params[key];
+            }
         }
-        if (surname && surname.length && isNaN(surname)) {
-            params.surname = surname;
-        }
-        if (lastname && lastname.length && isNaN(lastname)) {
-            params.lastname = lastname;
-        }
-        if (record_book && !isNaN(record_book)) {
-            params.record_book = record_book;
-        }
-        if (status && !isNaN(status)) {
-            params.status = status;
-        }
-        if (!isNaN(id) && params) {
+        if (id) { 
             const result = await journal.updateStudent(id, params);
-            res.send((result) ? result : 'Вероятно, такая запись уже существует. Проверьте вводимые данные.');
-        } else {
-            res.send('not enough parameters');
-        }
+            res.send((result) ? result : 'Вероятно, такая запись уже существует. Проверьте вводимые данные.'); 
+        } else { 
+            res.send('not enough parameters'); 
+        } 
     });
 
     router.get('/listOfStudents', async (req, res) => {

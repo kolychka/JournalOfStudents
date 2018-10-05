@@ -4,10 +4,22 @@ function DB() {
     var db;
 
 // STUDENT
-    this.getStudent = (name, record_book) => { 
+    this.getStudentByName = (name, record_book) => { 
         return new Promise((resolve, reject) => { 
             db.serialize(() => { 
-                db.get('SELECT * FROM student WHERE name=? AND record_book=?', [name, record_book], (err, row) => resolve((err) ? null : row));
+                if (name, record_book) {
+                    db.get('SELECT * FROM student WHERE name=? AND record_book=?', [name, record_book], (err, row) => resolve((err) ? null : row));
+                }
+            }); 
+        }); 
+    };
+
+    this.getStudentById = (id) => { 
+        return new Promise((resolve, reject) => { 
+            db.serialize(() => { 
+                if (id) {
+                    db.get('SELECT * FROM student WHERE id=?', [id], (err, row) => resolve((err) ? null : row));
+                } 
             }); 
         }); 
     };

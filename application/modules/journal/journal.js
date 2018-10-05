@@ -6,7 +6,7 @@ function Journal(options) {
     this.addStudent = async (name, surname, lastname, record_book, status) => {
         var result = await db.addStudent(name, surname, lastname, record_book, status);
         if (result) {
-            return await db.getStudent(name, record_book);
+            return await db.getStudentByName(name, record_book);
         } else {
             return null;
         }
@@ -15,7 +15,7 @@ function Journal(options) {
     this.updateStudent = async (id, params) => {
         var result = await db.updateStudent(id, params);
         if (result) {
-            return await db.getStudent(params.name, params.record_book);
+            return await db.getStudentById(id);
         } else {
             return null;
         }
