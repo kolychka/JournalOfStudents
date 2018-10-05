@@ -6,7 +6,7 @@ function Router(options) {
     var router = express.Router();
     var journal = options.journal;
 
-// STUDENT
+// STUDENT  +
 
     router.get('/addStudent', async (req, res) => {
         var name = req.query.name;
@@ -49,14 +49,14 @@ function Router(options) {
 
     router.get('/deleteStudent/:id', async (req, res) => {
         var id = req.params.id - 0;
-        if (!isNaN(id)) {
+        if (id) {
             res.send(await journal.deleteStudent(id));
         } else {
             res.send('not enough id parameter');
         }
     });
 
-// LESSON   
+// LESSON   +
     router.get('/addLesson', async (req, res) => {
         var name = req.query.name;
         if (name) {
@@ -66,16 +66,16 @@ function Router(options) {
             res.send('not enough parameter');
         }
     });
-
-    router.get('/updateLesson', async (req, res) => {
-        var id = req.query.id - 0;
-        var name = req.query.name;
-        if (!isNaN(id) && name) {
+    
+    router.get('/updateLesson', async (req, res) => { 
+        var id = req.query.id - 0; 
+        var name = (req.query.name) ? req.query.name : null; 
+        if (id && name) { 
             const result = await journal.updateLesson(id, name);
-            res.send((result) ? result : 'Вероятно, такая запись уже существует. Проверьте вводимые данные.');
-        } else {
-            res.send('not enough parameter');
-        }
+            res.send((result) ? result : 'Вероятно, такая запись уже существует. Проверьте вводимые данные.'); 
+        } else { 
+            res.send('not enough parameters'); 
+        } 
     });
 
     router.get('/listOfLessons', async (req, res) => {
@@ -84,14 +84,14 @@ function Router(options) {
 
     router.get('/deleteLesson/:id', async (req, res) => {
         var id = req.params.id - 0;
-        if (!isNaN(id)) {
+        if (id) {
             res.send(await journal.deleteLesson(id));
         } else {
             res.send('not enough id parameter');
         }
     });
 
-// SUBGROUP 
+// SUBGROUP   +
     router.get('/addSubgroup', async (req, res) => {
         var name = req.query.name;
         var description = req.query.description;
@@ -104,17 +104,23 @@ function Router(options) {
         }
     });
  
-    router.get('/updateSubgroup', async (req, res) => {
-        var id = req.query.id - 0;
-        var name = req.query.name;
-        var description = req.query.description;
-        var group_code = req.query.group_code;
-        if (!isNaN(id) && name) {
-            const result = await journal.updateSubgroup(id, name, description, group_code);
-            res.send((result) ? result : 'Вероятно, такая запись уже существует. Проверьте вводимые данные.');
-        } else {
-            res.send('not enough parameters');
+    router.get('/updateSubgroup', async (req, res) => { 
+        var id = req.query.id - 0; 
+        var name = (req.query.name) ? req.query.name : null; 
+        var description = (req.query.description) ? req.query.description : null; 
+        var group_code = (req.query.group_code) ? req.query.group_code : null; 
+        var params = { name, description, group_code };
+        for (let key in params) {
+            if (!params[key]) {
+                delete params[key];
+            }
         }
+        if (id) { 
+            const result = await journal.updateSubgroup(id, params);
+            res.send((result) ? result : 'Вероятно, такая запись уже существует. Проверьте вводимые данные.'); 
+        } else { 
+            res.send('not enough parameters'); 
+        } 
     });
   
     router.get('/listOfSubgroups', async (req, res) => {
@@ -123,14 +129,14 @@ function Router(options) {
     
     router.get('/deleteSubgroup/:id', async (req, res) => { 
         var id = req.params.id - 0;
-        if (!isNaN(id)) {
+        if (id) {
             res.send(await journal.deleteSubgroup(id));
         } else {
             res.send('not enough id parameter');
         }
     });
 
-// USER
+// USER   +
     router.get('/addUser', async (req, res) => {
         var role = req.query.role - 0;
         var name = req.query.name;
@@ -144,19 +150,25 @@ function Router(options) {
             res.send('not enough parameters');
         }
     });
- 
-    router.get('/updateUser', async (req, res) => {
-        var id = req.query.id - 0;
-        var role = req.query.role - 0;
-        var name = req.query.name;
-        var login = req.query.login;
-        var password = req.query.password;
-        if (!isNaN(id) && role && name && login && password) {
-            const result = await journal.updateUser(id, role, name, login, password);
-            res.send((result) ? result : 'Вероятно, такая запись уже существует. Проверьте вводимые данные.');
-        } else {
-            res.send('not enough parameters');
+
+    router.get('/updateUser', async (req, res) => { 
+        var id = req.query.id - 0; 
+        var role = (req.query.role - 0) ? req.query.role : null;
+        var name = (req.query.name) ? req.query.name : null; 
+        var login = (req.query.login) ? req.query.login : null; 
+        var password = (req.query.password) ? req.query.password : null; 
+        var params = { role, name, login, password };
+        for (let key in params) {
+            if (!params[key]) {
+                delete params[key];
+            }
         }
+        if (id) { 
+            const result = await journal.updateUser(id, params);
+            res.send((result) ? result : 'Вероятно, такая запись уже существует. Проверьте вводимые данные.'); 
+        } else { 
+            res.send('not enough parameters'); 
+        } 
     });
     
     router.get('/listOfUsers', async (req, res) => {
@@ -165,7 +177,7 @@ function Router(options) {
   
     router.get('/deleteUser/:id', async (req, res) => {
         var id = req.params.id - 0;
-        if (!isNaN(id)) {
+        if (id) {
             res.send(await journal.deleteUser(id));
         } else {
             res.send('not enough id parameter');
@@ -206,7 +218,7 @@ function Router(options) {
    
     router.get('/deleteSchedule/:id', (req, res) => {
         var id = req.params.id - 0;
-        if (!isNaN(id)) {
+        if (id) {
             journal.deleteSchedule(id).then((result) => res.send(result));
         } else {
             res.send('not enough id parameter');
@@ -217,7 +229,7 @@ function Router(options) {
     router.get('/noteStudents', async (req, res) => {
         var noteList = req.query.noteList; // пример строки - 1,0;2,1;3,0;4,1
         var scheduleId = req.query.scheduleId - 0;
-        if (noteList && !isNaN(scheduleId)) {
+        if (noteList && scheduleId) {
             const result = await journal.noteStudents(noteList, scheduleId);
             res.send((result) ? result : 'Вероятно, такая запись уже существует. Проверьте вводимые данные.');
         } else {

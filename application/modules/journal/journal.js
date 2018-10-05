@@ -33,16 +33,16 @@ function Journal(options) {
     this.addLesson = async (name) => {
         var result = await db.addLesson(name);
         if (result) {
-            return await db.getLesson(name);
+            return await db.getLessonByName(name);
         } else {
             return null;
         }
     };
-
+  
     this.updateLesson = async (id, name) => {
         var result = await db.updateLesson(id, name);
         if (result) {
-            return await db.getLesson(name);
+            return await db.getLessonById(id);
         } else {
             return null;
         }
@@ -60,16 +60,16 @@ function Journal(options) {
     this.addSubgroup = async (name, description, group_code) => {
         var result = await db.addSubgroup(name, description, group_code);
         if (result) {
-            return await db.getSubgroup(name, description, group_code);
+            return await db.getSubgroupByName(name, description, group_code);
         } else {
             return null;
         }
     };
-
-    this.updateSubgroup = async (id, name, description, group_code) => {
-        var result = await db.updateSubgroup(id, name, description, group_code);
+  
+    this.updateSubgroup = async (id, params) => {
+        var result = await db.updateSubgroup(id, params);
         if (result) {
-            return await db.getSubgroup(name, description, group_code);
+            return await db.getSubgroupById(id);
         } else {
             return null;
         }
@@ -87,16 +87,16 @@ function Journal(options) {
     this.addUser = async (role, name, login, password) => {
         var result = await db.addUser(role, name, login, password);
         if (result) {
-            return await db.getUser(role, name);
+            return await db.getUserByName(role, name);
         } else {
             return null;
         }
     };
-
-    this.updateUser = async (id, role, name, login, password) => {
-        var result = await db.updateUser(id, role, name, login, password);
+  
+    this.updateUser = async (id, params) => {
+        var result = await db.updateUser(id, params);
         if (result) {
-            return await db.getUser(role, name);
+            return await db.getUserById(id);
         } else {
             return null;
         }

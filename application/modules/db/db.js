@@ -35,9 +35,9 @@ function DB() {
         return new Promise((resolve,reject) => {
             var str = [];
             var arr =[];
-            for (let par in params) {
-                str.push(par + " = ?");
-                arr.push(params[par]);
+            for (let key in params) {
+                str.push(key + " = ?");
+                arr.push(params[key]);
             }
             arr.push(id);
             const query = "UPDATE student SET " + str.join(', ') + " WHERE id = ?";
@@ -68,11 +68,20 @@ function DB() {
     };  
 
 // LESSON    
-    this.getLesson = (name) => {
+    this.getLessonByName = (name) => {
         return new Promise((resolve, reject) => {
             db.serialize(() => {
                 const query = "SELECT * FROM lesson WHERE name=?";
                 db.get(query, [name], (err, row) => resolve((err) ? null : row));
+            });
+        });
+    };
+
+    this.getLessonById = (id) => {
+        return new Promise((resolve, reject) => {
+            db.serialize(() => {
+                const query = "SELECT * FROM lesson WHERE id=?";
+                db.get(query, [id], (err, row) => resolve((err) ? null : row));
             });
         });
     };
@@ -124,12 +133,20 @@ function DB() {
     };
    
 // SUBGROUP    
-    this.getSubgroup = (name) => {
+    this.getSubgroupByName = (name) => {
         return new Promise((resolve, reject) => {
             db.serialize(() => {
                 db.get("SELECT * FROM subgroup WHERE name=?", [name], (err, row) => resolve((err) ? null : row));
             });
-        })
+        });
+    };
+
+    this.getSubgroupById = (id) => {
+        return new Promise((resolve, reject) => {
+            db.serialize(() => {
+                db.get("SELECT * FROM subgroup WHERE id=?", [id], (err, row) => resolve((err) ? null : row));
+            });
+        });
     };
 
     this.addSubgroup = (name, description, group_code) => {
@@ -139,10 +156,17 @@ function DB() {
         });
     };
 
-    this.updateSubgroup = (id, name, description, group_code) => {
-        return new Promise((resolve, reject) => {
-            const query = "UPDATE subgroup SET name = ?, description = ?, group_code = ? WHERE id = ?";
-            db.run(query, [name, description, group_code, id], err => resolve(!err));
+    this.updateSubgroup = (id, params) => {
+        return new Promise((resolve,reject) => {
+            var str = [];
+            var arr =[];
+            for (let key in params) {
+                str.push(key + " = ?");
+                arr.push(params[key]);
+            }
+            arr.push(id);
+            const query = "UPDATE subgroup SET " + str.join(', ') + " WHERE id = ?";
+            db.run(query, arr, err => resolve(!err));
         });
     };
 
@@ -180,10 +204,18 @@ function DB() {
     };
 
 // USER
-    this.getUser = (role, name) => { 
+    this.getUserByName = (name, role) => { 
         return new Promise((resolve, reject) => { 
             db.serialize(() => { 
                 db.get('SELECT * FROM user WHERE role=? AND name=?', [role, name], (err, row) => resolve((err) ? null : row)); 
+            }); 
+        }); 
+    };
+
+    this.getUserById = (id) => { 
+        return new Promise((resolve, reject) => { 
+            db.serialize(() => { 
+                db.get('SELECT * FROM user WHERE id=?', [id], (err, row) => resolve((err) ? null : row)); 
             }); 
         }); 
     };
@@ -197,12 +229,17 @@ function DB() {
         });
     };
 
-    this.updateUser = (id, role, name, login, password) => {
+    this.updateUser = (id, params) => {
         return new Promise((resolve,reject) => {
-            const query = "UPDATE user SET role = ?, name = ?, login = ?, password = ? WHERE id = ?";
-            db.run(query, [role, name, login, password, id], function (err) {
-                resolve(!(err));
-            });
+            var str = [];
+            var arr =[];
+            for (let key in params) {
+                str.push(key + " = ?");
+                arr.push(params[key]);
+            }
+            arr.push(id);
+            const query = "UPDATE user SET " + str.join(', ') + " WHERE id = ?";
+            db.run(query, arr, err => resolve(!err));
         });
     };
 
