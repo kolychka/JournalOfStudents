@@ -83,33 +83,6 @@ function Journal(options) {
         return db.deleteSubgroup(id);
     };
 
-// USER
-    this.addUser = async (role, name, login, password) => {
-        var result = await db.addUser(role, name, login, password);
-        if (result) {
-            return await db.getUserByName(role, name);
-        } else {
-            return null;
-        }
-    };
-  
-    this.updateUser = async (id, params) => {
-        var result = await db.updateUser(id, params);
-        if (result) {
-            return await db.getUserById(id);
-        } else {
-            return null;
-        }
-    };
-
-    this.listOfUsers = () => {
-        return db.getListOfUsers();
-    };
-
-    this.deleteUser = (id) => {
-        return db.deleteUser(id);
-    };
-
 // SCHEDULE
     this.addSchedule = async (time, day, lesson_id, subgroup_id) => {
         var result = await db.addSchedule(time, day, lesson_id, subgroup_id);

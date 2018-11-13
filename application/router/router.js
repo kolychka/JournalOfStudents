@@ -1,13 +1,14 @@
 'use strict';
 
 var express = require('express');
+const md5 = require('md5');
 
 function Router(options) {
     var router = express.Router();
+    var user = options.user;
     var journal = options.journal;
 
 // STUDENT  +
-
     router.get('/addStudent', async (req, res) => {
         var name = req.query.name;
         var surname = req.query.surname;
@@ -137,14 +138,36 @@ function Router(options) {
     });
 
 // USER   +
+
+    router.get('/login', async (req, res) => {
+        const login = req.query.login;
+        const hash = req.query.hash;
+        const rnd = req.query.rnd;
+        if (login && hash && rnd) {
+            const result = await user.login(login, hash, rnd);
+            res.send((result) ? result : 'Неудачная авторизация');
+        } else {
+            res.send('not enough parameters');
+        }
+    });
+    
+    router.get('/logout', async (req, res) => {
+        const token = req.query.token;
+        if (token) {
+            const result = await user.logout(token);
+            res.send((result) ? result : 'Неудачный выход');
+        } else {
+            res.send('not enough parameters');
+        }
+    });
+
     router.get('/addUser', async (req, res) => {
-        var role = req.query.role - 0;
-        var name = req.query.name;
-        var login = req.query.login;
-        var password = req.query.password;
-        var token = req.query.token;
+        const role = req.query.role - 0;
+        const name = req.query.name;
+        const login = req.query.login;
+        const password = req.query.password;
         if (role && name && login && password) {
-            const result = await journal.addUser(role, name, login, password);
+            const result = await user.addUser(role, name, login, password);
             res.send((result) ? result : 'Вероятно, такая запись уже существует. Проверьте вводимые данные.');
         } else {
             res.send('not enough parameters');
@@ -152,11 +175,11 @@ function Router(options) {
     });
 
     router.get('/updateUser', async (req, res) => { 
-        var id = req.query.id - 0; 
-        var role = (req.query.role - 0) ? req.query.role : null;
-        var name = (req.query.name) ? req.query.name : null; 
-        var login = (req.query.login) ? req.query.login : null; 
-        var password = (req.query.password) ? req.query.password : null; 
+        const id = req.query.id - 0; 
+        const role = (req.query.role - 0) ? req.query.role : null;
+        const name = (req.query.name) ? req.query.name : null; 
+        const login = (req.query.login) ? req.query.login : null; 
+        const password = (req.query.password) ? req.query.password : null; 
         var params = { role, name, login, password };
         for (let key in params) {
             if (!params[key]) {
@@ -164,21 +187,21 @@ function Router(options) {
             }
         }
         if (id) { 
-            const result = await journal.updateUser(id, params);
+            const result = await user.updateUser(id, params);
             res.send((result) ? result : 'Вероятно, такая запись уже существует. Проверьте вводимые данные.'); 
         } else { 
             res.send('not enough parameters'); 
         } 
     });
     
-    router.get('/listOfUsers', async (req, res) => {
-        res.send(await journal.listOfUsers());
+    router.get('/listOfUsers', async (req, res) => { // небезопасный, убрать пароли, токены, логины
+        res.send(await user.listOfUsers());
     });
   
     router.get('/deleteUser/:id', async (req, res) => {
         var id = req.params.id - 0;
         if (id) {
-            res.send(await journal.deleteUser(id));
+            res.send(await user.deleteUser(id));
         } else {
             res.send('not enough id parameter');
         }

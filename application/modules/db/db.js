@@ -204,7 +204,35 @@ function DB() {
     };
 
 // USER
-    this.getUserByName = (name, role) => { 
+
+    this.getUser = (login) => {
+        return new Promise((resolve, reject) => { 
+            db.get('SELECT * FROM user WHERE login= ?', [login], (err, row) => resolve((err) ? null : row)); 
+        });
+    };
+
+    this.getUserByToken = (token) => {
+        return new Promise((resolve, reject) => { 
+            db.get('SELECT * FROM user WHERE token= ?', [token], (err, row) => resolve((err) ? null : row)); 
+        });
+    };
+
+    this.updateUserToken = (id, token) => {
+        return new Promise((resolve, reject) => {
+            db.run("UPDATE user SET token = ? WHERE id = ?", [token, id], err => resolve(!err));
+        });
+    };
+
+    this.addUser = (role, name, login, password) => {
+        return new Promise((resolve, reject) => {
+            const query = "INSERT INTO user (role, name, login, password) VALUES (?, ?, ?, ?)";
+            db.run(query, [role, name, login, password], function (err) {
+                resolve(!(err));
+            });
+        });
+    };
+
+    /*this.getUserByName = (name, role) => { 
         return new Promise((resolve, reject) => { 
             db.serialize(() => { 
                 db.get('SELECT * FROM user WHERE role=? AND name=?', [role, name], (err, row) => resolve((err) ? null : row)); 
@@ -220,19 +248,18 @@ function DB() {
         }); 
     };
 
-    this.addUser = (role, name, login, password) => {
-        return new Promise((resolve,reject) => {
-            const query = "INSERT INTO user (role, name, login, password) VALUES (?, ?, ?, ?)";
-            db.run(query, [role, name, login, password], function (err) {
-                resolve(!(err));
-            });
-        });
-    };
+    this.login = (login, password) => { //выдаёт значения для сессии
+        return new Promise((resolve, reject) => { 
+            db.serialize(() => { 
+                db.get('SELECT id, role, name, token FROM user WHERE login=? AND password=?', [login, password], (err, row) => resolve((err) ? null : row)); 
+            }); 
+        }); 
+    };*/
 
     this.updateUser = (id, params) => {
-        return new Promise((resolve,reject) => {
+        return new Promise((resolve, reject) => {
             var str = [];
-            var arr =[];
+            var arr = [];
             for (let key in params) {
                 str.push(key + " = ?");
                 arr.push(params[key]);
