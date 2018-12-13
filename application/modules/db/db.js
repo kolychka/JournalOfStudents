@@ -1,7 +1,7 @@
-var sqlite3 = require('sqlite3').verbose();
+const sqlite3 = require('sqlite3').verbose();
 
 function DB() {
-    var db;
+    let db;
 
 // STUDENT
     this.getStudentByName = (name, record_book) => { 
@@ -33,8 +33,8 @@ function DB() {
 
     this.updateStudent = (id, params) => {
         return new Promise((resolve,reject) => {
-            var str = [];
-            var arr =[];
+            let str = [];
+            let arr =[];
             for (let key in params) {
                 str.push(key + " = ?");
                 arr.push(params[key]);
@@ -68,11 +68,11 @@ function DB() {
     };  
 
 // LESSON    
-    this.getLessonByName = (name) => {
+    this.getLessonByName = (name_lesson) => {
         return new Promise((resolve, reject) => {
             db.serialize(() => {
                 const query = "SELECT * FROM lesson WHERE name=?";
-                db.get(query, [name], (err, row) => resolve((err) ? null : row));
+                db.get(query, [name_lesson], (err, row) => resolve((err) ? null : row));
             });
         });
     };
@@ -86,16 +86,16 @@ function DB() {
         });
     };
 
-    this.addLesson = (name) => {
+    this.addLesson = (name_lesson) => {
         return new Promise((resolve, reject) => {
-            db.run("INSERT INTO lesson (name) VALUES (?)", [name], err => resolve(!err));
+            db.run("INSERT INTO lesson (name) VALUES (?)", [name_lesson], err => resolve(!err));
         });
     };
 
-    this.updateLesson = (id, name) => {
+    this.updateLesson = (id, name_lesson) => {
         return new Promise((resolve,reject) => {
             const query = "UPDATE lesson SET name = ? WHERE id = ?";
-            db.run(query, [name, id], err => resolve(!err));
+            db.run(query, [name_lesson, id], err => resolve(!err));
         });
     };
 
@@ -149,17 +149,17 @@ function DB() {
         });
     };
 
-    this.addSubgroup = (name, description, group_code) => {
+    this.addSubgroup = (name_subgroup, description, group_code) => {
         return new Promise((resolve, reject) => {
             const query = "INSERT INTO subgroup (name, description, group_code) VALUES (?, ?, ?)";
-            db.run(query, [name, description, group_code], err => resolve(!err));
+            db.run(query, [name_subgroup, description, group_code], err => resolve(!err));
         });
     };
 
     this.updateSubgroup = (id, params) => {
         return new Promise((resolve,reject) => {
-            var str = [];
-            var arr =[];
+            let str = [];
+            let arr =[];
             for (let key in params) {
                 str.push(key + " = ?");
                 arr.push(params[key]);
@@ -204,7 +204,6 @@ function DB() {
     };
 
 // USER
-
     this.getUser = (login) => {
         return new Promise((resolve, reject) => { 
             db.get('SELECT * FROM user WHERE login= ?', [login], (err, row) => resolve((err) ? null : row)); 
@@ -214,6 +213,13 @@ function DB() {
     this.getUserByToken = (token) => {
         return new Promise((resolve, reject) => { 
             db.get('SELECT * FROM user WHERE token= ?', [token], (err, row) => resolve((err) ? null : row)); 
+        });
+    };
+
+    this.getUserById = (id) => {
+        console.log(id);
+        return new Promise((resolve, reject) => { 
+            db.get('SELECT * FROM user WHERE id= ?', [id], (err, row) => resolve((err) ? null : row)); 
         });
     };
 
@@ -232,41 +238,24 @@ function DB() {
         });
     };
 
-    /*this.getUserByName = (name, role) => { 
-        return new Promise((resolve, reject) => { 
-            db.serialize(() => { 
-                db.get('SELECT * FROM user WHERE role=? AND name=?', [role, name], (err, row) => resolve((err) ? null : row)); 
-            }); 
-        }); 
-    };
-
-    this.getUserById = (id) => { 
-        return new Promise((resolve, reject) => { 
-            db.serialize(() => { 
-                db.get('SELECT * FROM user WHERE id=?', [id], (err, row) => resolve((err) ? null : row)); 
-            }); 
-        }); 
-    };
-
-    this.login = (login, password) => { //выдаёт значения для сессии
-        return new Promise((resolve, reject) => { 
-            db.serialize(() => { 
-                db.get('SELECT id, role, name, token FROM user WHERE login=? AND password=?', [login, password], (err, row) => resolve((err) ? null : row)); 
-            }); 
-        }); 
-    };*/
-
     this.updateUser = (id, params) => {
         return new Promise((resolve, reject) => {
-            var str = [];
-            var arr = [];
+            let str = [];
+            let arr = [];
             for (let key in params) {
                 str.push(key + " = ?");
                 arr.push(params[key]);
             }
             arr.push(id);
-            const query = "UPDATE user SET " + str.join(', ') + " WHERE id = ?";
+            const query = "UPDATE user SET " + str.join(', ') + " WHERE token = ?";
             db.run(query, arr, err => resolve(!err));
+        });
+    };
+
+    this.updateUserPassword = (id, password) => {
+        return new Promise((resolve,reject) => {
+            const query = "UPDATE user SET password = ? WHERE id = ?";
+            db.run(query, [password, id], err => resolve(!err));
         });
     };
 
@@ -301,10 +290,17 @@ function DB() {
         });
     };
 
-    this.updateSchedule = (id, time, day, lesson_id, subgroup_id) => {
+    this.updateSchedule = (id, params) => {
         return new Promise((resolve, reject) => {
-            const query = "UPDATE schedule SET time = ?, day = ?, lesson_id = ?, subgroup_id = ? WHERE id = ?";
-            db.run(query, [time, day, lesson_id, subgroup_id, id], err => resolve(!err));
+            let str = [];
+            let arr = [];
+            for (let key in params) {
+                str.push(key + " = ?");
+                arr.push(params[key]);
+            }
+            arr.push(id);
+            const query = "UPDATE schedule SET " + str.join(', ') + " WHERE id = ?";
+            db.run(query, arr, err => resolve(!err));
         });
     };
 
@@ -343,14 +339,14 @@ function DB() {
             if (studentsList && studentsList.length && schedule_id) {
                 str = [];
                 arr = [];
-                for (var i = 0; i < studentsList.length; i++) {
+                for (let i = 0; i < studentsList.length; i++) {
                     str.push('(?, ?, ?)');
                     arr.push(schedule_id);
                     arr.push(studentsList[i].id);
                     arr.push(studentsList[i].status);
                 }
                 str = str.join(',');
-                var query = "INSERT INTO journal (schedule_id, student_id, status) VALUES " + str;
+                let query = "INSERT INTO journal (schedule_id, student_id, status) VALUES " + str;
                 db.run(query, arr, function (err) {
                     resolve(!(err));
                 });
@@ -363,7 +359,7 @@ function DB() {
     this.getUploadData = (startDate, finishDate) => {
         return new Promise((resolve, reject) => {
             db.serialize(function () {
-                var query = "SELECT student.name, " + 
+                let query = "SELECT student.name, " + 
                                     "student.lastname, " + 
                                     "student.surname, " + 
                                     "journal.status, " + 

@@ -1,301 +1,277 @@
 'use strict';
 
-var express = require('express');
+//почитать про деструктуризацию объектов
+
+const express = require('express');
 const md5 = require('md5');
+const Verification = require('../modules/verification/verification');
+const Errors = require('./errors');
 
 function Router(options) {
-    var router = express.Router();
-    var user = options.user;
-    var journal = options.journal;
+    const router = express.Router();
+    const user = options.user;
+    const journal = options.journal;
+    const verification = new Verification();
+    const PARAM = verification.getParamNames();
+    const errors = new Errors();
 
-// STUDENT  +
-    router.get('/addStudent', async (req, res) => {
-        /*var name = req.query.name;
-        var surname = req.query.surname;
-        var lastname = req.query.lastname;
-        var record_book = req.query.record_book - 0;
-        var status = req.query.status - 0;*/
-        //if (name && record_book) {
-        if (verification.check(req.query, [PARAM.NAME, PARAM.RECORD_BOOK])) {
-            const result = await journal.addStudent(req.query);
-            res.send((result) ? result : 'Вероятно, такая запись уже существует. Проверьте вводимые данные.');
+// STUDENT  
+/*+*/ // -- означает, что метод проверен и работает
+    // const obj1 = {
+    //     a: 7, b: 2
+    // };
+    // const obj2 = {
+    //     c: 5, d: function () {}
+    // }; /*+*/
+
+    // const obj3 = { ...obj1, ...obj2 };
+    // console.log(obj3);
+
+/*+*/    router.get('/addStudent/:name/:record_book', async (req, res) => {
+        const par = { ...req.params, ...req.query };
+        if (verification.check(par, [PARAM.NAME, PARAM.RECORD_BOOK])) {
+            const result = await journal.addStudent(par);
+            res.send((result) ? result : errors.get(2001));
         } else {
-            res.send('not enough parameters');
+            res.send(errors.get(2002)); // идёт сюда
         }
     });
 
-    // router.get('/updateStudent', async (req, res) => { 
-    //     var id = req.query.id - 0; 
-    //     var name = (req.query.name) ? req.query.name : null; 
-    //     var surname = (req.query.surname) ? req.query.surname : null; 
-    //     var lastname = (req.query.lastname) ? req.query.lastname : null; 
-    //     var record_book = (req.query.record_book - 0) ? (req.query.record_book - 0) : null; 
-    //     var status = (req.query.status - 0) ? (req.query.status - 0) : null; 
-    //     var params = { name, surname, lastname, record_book, status };
-    //     for (let key in params) {
-    //         if (!params[key]) {
-    //             delete params[key];
-    //         }
-    //     }
-    //     if (id) { 
-    //         const result = await journal.updateStudent(id, params);
-    //         res.send((result) ? result : 'Вероятно, такая запись уже существует. Проверьте вводимые данные.'); 
-    //     } else { 
-    //         res.send('not enough parameters'); 
-    //     } 
-    // });
+/*+*/    router.get('/updateStudent', async (req, res) => { 
+        let params = { id: req.query.id, name: req.query.name, surname: req.query.surname, lastname: req.query.lastname, 
+                       record_book: req.query.record_book, status: req.query.status };
+        const keys = [];
+        for (let key in params) {
+            !params[key] ? delete params[key] : keys.push(key);
+        }
+        if (verification.check(params, keys)){
+            delete params[params.id];
+            const result = await journal.updateStudent(req.query.id, params);
+            res.send((result) ? result : errors.get(2001)); 
+        } else { 
+            res.send(errors.get(2002)); 
+        } 
+    });
 
-    router.get('/listOfStudents', async (req, res) => {
+/*+*/    router.get('/listOfStudents', async (req, res) => {
         res.send(await journal.listOfStudents());
     });
 
-    router.get('/deleteStudent/:id', async (req, res) => {
-        // var id = req.params.id - 0;
-        // if (id) {
-        if (verification.check(req.query, [PARAM.ID])) {
-            res.send(await journal.deleteStudent(req.query));
+/*+*/    router.get('/deleteStudent/:id', async (req, res) => {
+        if (verification.check(req.params, [PARAM.ID])) {
+            res.send(await journal.deleteStudent(req.params));
         } else {
-            res.send('not enough id parameter');
+            res.send(errors.get(2002));
         }
     });
 
-// LESSON   +
-    router.get('/addLesson', async (req, res) => {
-        // var name = req.query.name;
-        // if (name) {
-        if (verification.check(req.query, [PARAM.NAME_LESSON])) {
-            const result = await journal.addLesson(req.query);
-            res.send((result) ? result : 'Вероятно, такая запись уже существует. Проверьте вводимые данные.');
+// LESSON   
+/*+*/    router.get('/addLesson/:name_lesson', async (req, res) => {
+        const par = { ...req.params, ...req.query };
+        if (verification.check(par, [PARAM.NAME_LESSON])) {
+            const result = await journal.addLesson(par);
+            res.send((result) ? result : errors.get(2001));
         } else {
-            res.send('not enough parameter');
+            res.send(errors.get(2002));
         }
     });
     
-    // router.get('/updateLesson', async (req, res) => { 
-    //     var id = req.query.id - 0; 
-    //     var name = (req.query.name) ? req.query.name : null; 
-    //     if (id && name) { 
-    //         const result = await journal.updateLesson(id, name);
-    //         res.send((result) ? result : 'Вероятно, такая запись уже существует. Проверьте вводимые данные.'); 
-    //     } else { 
-    //         res.send('not enough parameters'); 
-    //     } 
-    // });
+/*+*/    router.get('/updateLesson/:id/:name_lesson', async (req, res) => { 
+        if (verification.check(req.params, [PARAM.ID, PARAM.NAME_LESSON])) { 
+            const result = await journal.updateLesson(req.params.id, req.params.name_lesson);
+            res.send((result) ? result : errors.get(2001)); 
+        } else { 
+            res.send(errors.get(2002)); 
+        } 
+    });
 
-    router.get('/listOfLessons', async (req, res) => {
+/*+*/    router.get('/listOfLessons', async (req, res) => {
         res.send(await journal.listOfLessons());
     });
 
-    router.get('/deleteLesson/:id', async (req, res) => {
-        // var id = req.params.id - 0;
-        // if (id) {
-        if (verification.check(req.query, [PARAM.ID])) {
-            res.send(await journal.deleteLesson(req.query));
+/*+*/    router.get('/deleteLesson/:id', async (req, res) => {
+        if (verification.check(req.params, [PARAM.ID])) {
+            res.send(await journal.deleteLesson(req.params));
         } else {
-            res.send('not enough id parameter');
+            res.send(errors.get(2002));
         }
     });
 
-// SUBGROUP   +
-    router.get('/addSubgroup', async (req, res) => {
-        // var name = req.query.name;
-        // var description = req.query.description;
-        // var group_code = req.query.group_code;
-        // if (name) {
-        if (verification.check(req.query, [PARAM.NAME, PARAM.DESCRIPTION, PARAM.GROUP_CODE])) {
-            const result = await journal.addSubgroup(req.query);
-            res.send((result) ? result : 'Вероятно, такая запись уже существует. Проверьте вводимые данные.');
+// SUBGROUP   
+/*+*/    router.get('/addSubgroup/:name_subgroup', async (req, res) => {
+        const par = { ...req.params, ...req.query };
+        if (verification.check(par, [PARAM.NAME_SUBGROUP, PARAM.DESCRIPTION, PARAM.GROUP_CODE])) {
+            const result = await journal.addSubgroup(par);
+            res.send((result) ? result : errors.get(2001));
         } else {
-            res.send('not enough parameters');
+            res.send(errors.get(2002));
         }
     });
  
-    // router.get('/updateSubgroup', async (req, res) => { 
-    //     var id = req.query.id - 0; 
-    //     var name = (req.query.name) ? req.query.name : null; 
-    //     var description = (req.query.description) ? req.query.description : null; 
-    //     var group_code = (req.query.group_code) ? req.query.group_code : null; 
-    //     var params = { name, description, group_code };
-    //     for (let key in params) {
-    //         if (!params[key]) {
-    //             delete params[key];
-    //         }
-    //     }
-    //     if (id) { 
-    //         const result = await journal.updateSubgroup(id, params);
-    //         res.send((result) ? result : 'Вероятно, такая запись уже существует. Проверьте вводимые данные.'); 
-    //     } else { 
-    //         res.send('not enough parameters'); 
-    //     } 
-    // });
+    router.get('/updateSubgroup', async (req, res) => { 
+        let params = { id: req.query.id, name: req.query.name, description: req.query.description, group_code: req.query.group_code };
+        const keys = [];
+        for (let key in params) {
+            !params[key] ? delete params[key] : keys.push(key);
+        }
+        if (verification.check(params, keys)){
+            delete params[params.id];
+            const result = await journal.updateSubgroup(req.query.id, params);
+            res.send((result) ? result : errors.get(2001));             
+        } else { 
+            res.send(errors.get(2002)); 
+        } 
+    });
   
-    router.get('/listOfSubgroups', async (req, res) => {
+/*+*/    router.get('/listOfSubgroups', async (req, res) => {
         res.send(await journal.listOfSubgroups());
     });
     
-    router.get('/deleteSubgroup/:id', async (req, res) => { 
-        // var id = req.params.id - 0;
-        // if (id) {
-        if (verification.check(req.query, [PARAM.ID])) {
-            res.send(await journal.deleteSubgroup(req.query));
+/*+*/    router.get('/deleteSubgroup/:id', async (req, res) => { 
+        if (verification.check(req.params, [PARAM.ID])) {
+            res.send(await journal.deleteSubgroup(req.params));
         } else {
-            res.send('not enough id parameter');
+            res.send(errors.get(2002));
         }
     });
 
-// USER   +
-    router.get('/login', async (req, res) => {
-        // const login = req.query.login;
-        // const hash = req.query.hash;
-        // const rnd = req.query.rnd;
-        // if (login && hash && rnd) {
-        if (verification.check(req.query, [PARAM.LOGIN, PARAM.HASH, RND])) {
-            const result = await user.login(req.query);
-            res.send((result) ? result : 'Неудачная авторизация');
+// USER   
+    router.get('/login/:login/:hash/:rnd', async (req, res) => {
+        if (verification.check(req.params, [PARAM.LOGIN, PARAM.HASH, PARAM.RND])) {
+            const result = await user.login(req.params);
+            res.send((result) ? result : errors.get(2003));
         } else {
-            res.send('not enough parameters');
+            res.send(errors.get(2002));
         }
     });
     
-    router.get('/logout', async (req, res) => {
-        // const token = req.query.token;
-        // if (token) {
-        if (verification.check(req.query, [PARAM.TOKEN])) {
-            const result = await user.logout(req.query);
-            res.send((result) ? result : 'Неудачный выход');
+    router.get('/logout/:token', async (req, res) => {
+        if (verification.check(req.params, [PARAM.TOKEN])) {
+            const result = await user.logout(req.params);
+            res.send((result) ? result : errors.get(2006));
         } else {
-            res.send('not enough parameters');
+            res.send(errors.get(2002));
         }
     });
 
-    router.get('/addUser', async (req, res) => {
-        // const role = req.query.role - 0;
-        // const name = req.query.name;
-        // const login = req.query.login;
-        // const password = req.query.password;
-        // if (role && name && login && password) {
-        if (verification.check(req.query, [PARAM.ROLE, PARAM.NAME, PARAM.LOGIN, PARAM.PASSWORD])) {
-            const result = await user.addUser(req.query);
-            res.send((result) ? result : 'Вероятно, такая запись уже существует. Проверьте вводимые данные.');
+    router.get('/addUser/:role/:name/:login/:password', async (req, res) => {
+        const par = { ...req.params, ...req.query };
+        if (verification.check(par, [PARAM.ROLE, PARAM.NAME, PARAM.LOGIN, PARAM.PASSWORD])) {
+            const result = await user.addUser(par);
+            res.send((result) ? result : errors.get(2001));
         } else {
-            res.send('not enough parameters');
+            res.send(errors.get(2002));
         }
     });
 
-    // router.get('/updateUser', async (req, res) => { 
-    //     const id = req.query.id - 0; 
-    //     const role = (req.query.role - 0) ? req.query.role : null;
-    //     const name = (req.query.name) ? req.query.name : null; 
-    //     const login = (req.query.login) ? req.query.login : null; 
-    //     const password = (req.query.password) ? req.query.password : null; 
-    //     var params = { role, name, login, password };
-    //     for (let key in params) {
-    //         if (!params[key]) {
-    //             delete params[key];
-    //         }
-    //     }
-    //     if (id) { 
-    //         const result = await user.updateUser(id, params);
-    //         res.send((result) ? result : 'Вероятно, такая запись уже существует. Проверьте вводимые данные.'); 
-    //     } else { 
-    //         res.send('not enough parameters'); 
-    //     } 
-    // });
+    router.get('/updateUser', async (req, res) => { 
+        let params = { token: req.query.token, role: req.query.role, 
+                       name: req.query.name,  login: req.query.login, password: req.query.password };
+        const keys = [];
+        for (let key in params) {
+            !params[key] ? delete params[key] : keys.push(key);
+        }
+        if (verification.check(params, keys)){ 
+            delete params[params.token];
+            const result = await user.updateUser(req.query.token, params);
+            res.send((result) ? result : errors.get(2001)); 
+        } else { 
+            res.send(errors.get(2002)); 
+        } 
+    });
+
+    router.get('/updateUserPassword/:id/:password', async (req, res) => { 
+        if (verification.check(req.params, [PARAM.ID, PARAM.PASSWORD])) { 
+            const result = await user.updateUserPassword(req.params.id, req.params.password);
+            res.send((result) ? result : errors.get(2001)); 
+        } else { 
+            res.send(errors.get(2002)); 
+        } 
+    });
     
     router.get('/listOfUsers', async (req, res) => { // небезопасный, убрать пароли, токены, логины
         res.send(await user.listOfUsers());
     });
   
     router.get('/deleteUser/:id', async (req, res) => {
-        // var id = req.params.id - 0;
-        // if (id) {
-        if (verification.check(req.query, [PARAM.ID])) {
-            res.send(await user.deleteUser(req.query));
+        if (verification.check(req.params, [PARAM.ID])) {
+            res.send(await user.deleteUser(req.params));
         } else {
-            res.send('not enough id parameter');
+            res.send(errors.get(2002));
         }
     });
   
 // SCHEDULE
-    router.get('/addSchedule', async (req, res) => {
-        // var time = req.query.time - 0;
-        // var day = req.query.day;
-        // var lesson_id = req.query.lesson_id - 0;
-        // var subgroup_id = req.query.subgroup_id - 0;
-        // if (!isNaN(time) && day && !isNaN(lesson_id) && !isNaN(subgroup_id)) {
-        if (verification.check(req.query, [PARAM.TIME, PARAM.DAY, PARAM.LESSON_ID, PARAM.SUBGROUP_ID])) {
-            const result = await journal.addSchedule(req.query);
-            res.send((result) ? result : 'Вероятно, такая запись уже существует. Проверьте вводимые данные.');
+/*+*/    router.get('/addSchedule/:time/:day/:lesson_id/:subgroup_id', async (req, res) => {
+        const par = { ...req.params, ...req.query };
+        if (verification.check(par, [PARAM.TIME, PARAM.DAY, PARAM.LESSON_ID, PARAM.SUBGROUP_ID])) {
+            const result = await journal.addSchedule(par);
+            res.send((result) ? result : errors.get(2001));
         } else {
-            res.send('not enough parameters');
+            res.send(errors.get(2002));
         }
     });
 
-    // router.get('/updateSchedule', async (req, res) => {
-    //     var id = req.query.id - 0;
-    //     var time = req.query.time - 0;
-    //     var day = req.query.day;
-    //     var lesson_id = req.query.lesson_id - 0;
-    //     var subgroup_id = req.query.subgroup_id - 0;
-    //     if (!isNaN(id) && !isNaN(time) && day && !isNaN(lesson_id) && !isNaN(subgroup_id)) {
-    //         const result = await journal.updateSchedule(id, time, day, lesson_id, subgroup_id);
-    //         res.send((result) ? result : 'Вероятно, такая запись уже существует. Проверьте вводимые данные.');
-    //     } else {
-    //         res.send('not enough parameters');
-    //     }
-    // });
+    router.get('/updateSchedule', async (req, res) => {
+        let params = { id: req.query.id, time: req.query.time, day: req.query.day, 
+                       lesson_id: req.query.lesson_id, subgroup_id: req.query.subgroup_id };
+        const keys = [];
+        for (let key in params) {
+            !params[key] ? delete params[key] : keys.push(key);
+        }
+        if (verification.check(params, keys)){ 
+            delete params[params.id];
+            const result = await journal.updateSchedule(req.query.id, params);
+            res.send((result) ? result : errors.get(2001));
+        } else {
+            res.send(errors.get(2002));
+        }
+    });
 
-    router.get('/listOfSchedules', async (req, res) => {
+/*+*/    router.get('/listOfSchedules', async (req, res) => {
         res.send(await journal.listOfSchedules());
     });
    
-    router.get('/deleteSchedule/:id', (req, res) => {
-        // var id = req.params.id - 0;
-        // if (id) {
-        if (verification.check(req.query, [PARAM.ID])) {
-            journal.deleteSchedule(req.query).then((result) => res.send(result));
+/*+*/    router.get('/deleteSchedule/:id', (req, res) => {
+        const obj3 = {};
+        console.log(obj3);
+        if (verification.check(req.params, [PARAM.ID])) {
+            journal.deleteSchedule(req.params).then((result) => res.send(result));
         } else {
-            res.send('not enough id parameter');
+            res.send(errors.get(2002));
         }
     });
  
 // OTHERS    
     router.get('/noteStudents', async (req, res) => {
-        // var noteList = req.query.noteList; // пример строки - 1,0;2,1;3,0;4,1
-        // var schedule_id = req.query.schedule_id - 0;
-        // if (noteList && schedule_id) {
         if (verification.check(req.query, [PARAM.NOTE_LIST, PARAM.SCHEDULE_ID])) {
             const result = await journal.noteStudents(req.query);
-            res.send((result) ? result : 'Вероятно, такая запись уже существует. Проверьте вводимые данные.');
+            res.send((result) ? result : errors.get(2001));
         } else {
-            res.send('not enough parameters');
+            res.send(errors.get(2002));
         }
     });
 
     router.get('/uploadData', async (req, res) => {
-        // var startDate = req.query.startDate;
-        // var finishDate = req.query.finishDate;
-        // if (startDate && finishDate && (startDate <= finishDate)) {
         if (verification.check(req.query, [PARAM.START_DATE, PARAM.FINISH_DATE])) {
             const result = await journal.uploadData(req.query);
-            res.send((result) ? result : 'Вероятно, произошла ошибка. Проверьте вводимые данные.');
+            res.send((result) ? result : errors.get(2004));
         } else  if (startDate && !finishDate) {
-            var date = new Date();
-            var values = [ date.getDate(), date.getMonth() + 1 ];
-            for( var id in values ) {
+            const date = new Date();
+            let values = [ date.getDate(), date.getMonth() + 1 ];
+            for( let id in values ) {
                 values[ id ] = values[ id ].toString().replace( /^([0-9])$/, '0$1' );
             }
             finishDate = date.getFullYear() + '-' + values[ 1 ] + '-' + values[ 0 ];
             const result = journal.uploadData(PARAM.START_DATE, finishDate);
-            res.send((result) ? result : 'Вероятно, произошла ошибка. Проверьте вводимые данные.');
-        }
-        else {
-            res.send('not enough parameters');
+            res.send((result) ? result : errors.get(2004));
+        } else {
+            res.send(errors.get(2002));
         }
     });
   
     router.all('/*', (req, res) => {
-        res.send('wrong way');
+        res.send(errors.get(2005));
     });
 
     return router;
