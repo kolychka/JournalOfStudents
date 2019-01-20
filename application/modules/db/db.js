@@ -365,11 +365,9 @@ function DB() {
         });
     };
 
-    this.getUploadData = (startDate, finishDate) => {
-        console.log(startDate, finishDate, "db");
+    this.getUploadData = (start_date, finish_date) => {
         return new Promise((resolve, reject) => {
             db.serialize(function () {
-                console.log(startDate, finishDate, "db");
                 let query = "SELECT student.name, " + 
                                     "student.lastname, " + 
                                     "student.surname, " + 
@@ -381,28 +379,16 @@ function DB() {
                             "FROM student " +
                                 "INNER JOIN journal on student.id = journal.student_id " +
                                 "INNER JOIN schedule on schedule.id = journal.schedule_id AND schedule.day BETWEEN '" + 
-                                    startDate + 
+                                    start_date + 
                                     "' AND '" + 
-                                    finishDate + "' " +
+                                    finish_date + "' " +
                                 "INNER JOIN lesson on lesson.id = schedule.lesson_id " + 
                                 "INNER JOIN subgroup on subgroup.id = schedule.subgroup_id";
                 db.all(query, (err, row) => { resolve((err) ? null : row); });
             });
         });
     };
-
-    /*SELECT student.name, student.surname, student.lastname, 
-		journal.status, 
-		schedule.day, schedule.time, 
-		lesson.name AS lessonName, 
-		subgroup.name AS subgroupName 
-    FROM student 
-	    INNER JOIN journal on student.id = journal.student_id 
-	    INNER JOIN schedule on schedule.id = journal.schedule_id AND schedule.day 
-    BETWEEN '2017-12-31' AND '2019-01-01' 
-	    INNER JOIN lesson on lesson.id = schedule.lesson_id 
-	    INNER JOIN subgroup on subgroup.id = schedule.subgroup_id*/
-
+    
     this.deinit = () => {
         if (db) {
             db.close();

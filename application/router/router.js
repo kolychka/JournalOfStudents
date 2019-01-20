@@ -271,28 +271,26 @@ function Router(options) {
         }
     });
 
-/*НЕ готово*/    router.get('/uploadData/:start_date', async (req, res) => {
+    router.get('/uploadData/:start_date', async (req, res) => {
         // на вход ожидаются параметры: start_date (обязательный), finishDate
         if (verification.check(req.params, [PARAM.START_DATE, PARAM.FINISH_DATE])) {
             const result = await journal.uploadData(req.params);
             res.send((result) ? result : errors.get(2004));
-        } else if (verification.check(req.params, [PARAM.START_DATE]) /*&& !finishDate*/) {
+        } else if (verification.check(req.params, [PARAM.START_DATE])) {
             const date = new Date();
             let values = [ date.getDate(), date.getMonth() + 1 ];
             for (let id in values) {
                 values[ id ] = values[ id ].toString().replace( /^([0-9])$/, '0$1' );
             }
-            let FINISH_DATE = date.getFullYear() + '-' + values[ 1 ] + '-' + values[ 0 ];
-            console.log(req.params);
-            const params = { ...req.params, FINISH_DATE };
-            const result = journal.uploadData(params);
-            console.log(params);
+            let finish_date = date.getFullYear() + '-' + values[ 1 ] + '-' + values[ 0 ];
+            const params = { ...req.params, finish_date };
+            const result = await journal.uploadData(params);
             res.send((result) ? result : errors.get(2004));
         } else {
             res.send(errors.get(2002));
         }
     });
-  
+
     router.all('/*', (req, res) => {
         res.send(errors.get(2005));
     });

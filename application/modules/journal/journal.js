@@ -93,9 +93,8 @@ function Journal(options) {
         return await db.noteStudents(res, schedule_id);
     };
 
-    this.uploadData = ({start_date, FINISH_DATE}) => {
-        console.log(start_date, FINISH_DATE, "jou");
-        return db.getUploadData(start_date, FINISH_DATE);
+    this.uploadData = async ({start_date, finish_date}) => {
+        return await db.getUploadData(start_date, finish_date);
     };
 }
 
