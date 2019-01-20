@@ -149,10 +149,10 @@ function DB() {
         });
     };
 
-    this.addSubgroup = (name_subgroup, description, group_code) => {
+    this.addSubgroup = (name_subgroup, user_id, description, group_code) => {
         return new Promise((resolve, reject) => {
-            const query = "INSERT INTO subgroup (name, description, group_code) VALUES (?, ?, ?)";
-            db.run(query, [name_subgroup, description, group_code], err => resolve(!err));
+            const query = "INSERT INTO subgroup (name, user_id, description, group_code) VALUES (?, ?, ?, ?)";
+            db.run(query, [name_subgroup, user_id, description, group_code], err => resolve(!err));
         });
     };
 
@@ -217,7 +217,6 @@ function DB() {
     };
 
     this.getUserById = (id) => {
-        console.log(id);
         return new Promise((resolve, reject) => { 
             db.get('SELECT * FROM user WHERE id= ?', [id], (err, row) => resolve((err) ? null : row)); 
         });
@@ -238,7 +237,7 @@ function DB() {
         });
     };
 
-    this.updateUser = (id, params) => {
+    this.updateUser = (token, params) => {
         return new Promise((resolve, reject) => {
             let str = [];
             let arr = [];
@@ -246,7 +245,7 @@ function DB() {
                 str.push(key + " = ?");
                 arr.push(params[key]);
             }
-            arr.push(id);
+            arr.push(token);
             const query = "UPDATE user SET " + str.join(', ') + " WHERE token = ?";
             db.run(query, arr, err => resolve(!err));
         });
@@ -274,13 +273,23 @@ function DB() {
     };
 
 // SCHEDULE    
-    this.getSchedule = (time, day, lesson_id, subgroup_id) => {
+    this.getScheduleByParams = (time, day, lesson_id, subgroup_id) => {
         return new Promise((resolve, reject) => {
             db.serialize(() => {
                 const query = 'SELECT * FROM schedule WHERE time=? AND day=? AND lesson_id=? AND subgroup_id=?';
                 db.get(query, [time, day, lesson_id, subgroup_id], (err, row) => resolve((err) ? null : row));
             });
         });
+    };
+
+    this.getScheduleById = (id) => { 
+        return new Promise((resolve, reject) => { 
+            db.serialize(() => { 
+                if (id) {
+                    db.get('SELECT * FROM schedule WHERE id=?', [id], (err, row) => resolve((err) ? null : row));
+                } 
+            }); 
+        }); 
     };
 
     this.addSchedule = (time, day, lesson_id, subgroup_id) => {
@@ -357,8 +366,10 @@ function DB() {
     };
 
     this.getUploadData = (startDate, finishDate) => {
+        console.log(startDate, finishDate, "db");
         return new Promise((resolve, reject) => {
             db.serialize(function () {
+                console.log(startDate, finishDate, "db");
                 let query = "SELECT student.name, " + 
                                     "student.lastname, " + 
                                     "student.surname, " + 
@@ -375,10 +386,22 @@ function DB() {
                                     finishDate + "' " +
                                 "INNER JOIN lesson on lesson.id = schedule.lesson_id " + 
                                 "INNER JOIN subgroup on subgroup.id = schedule.subgroup_id";
-                    db.all(query, (err, row) => { resolve((err) ? null : row); });
+                db.all(query, (err, row) => { resolve((err) ? null : row); });
             });
         });
     };
+
+    /*SELECT student.name, student.surname, student.lastname, 
+		journal.status, 
+		schedule.day, schedule.time, 
+		lesson.name AS lessonName, 
+		subgroup.name AS subgroupName 
+    FROM student 
+	    INNER JOIN journal on student.id = journal.student_id 
+	    INNER JOIN schedule on schedule.id = journal.schedule_id AND schedule.day 
+    BETWEEN '2017-12-31' AND '2019-01-01' 
+	    INNER JOIN lesson on lesson.id = schedule.lesson_id 
+	    INNER JOIN subgroup on subgroup.id = schedule.subgroup_id*/
 
     this.deinit = () => {
         if (db) {

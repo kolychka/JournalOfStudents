@@ -18,7 +18,6 @@ function Journal(options) {
     };
 
     this.deleteStudent = ({id}) => {
-        console.log(id, "journal");
         return db.deleteStudent(id);
     };
 
@@ -42,9 +41,9 @@ function Journal(options) {
     };
 
 // SUBGROUP 
-    this.addSubgroup = async ({name_subgroup, description, group_code}) => {
-        const result = await db.addSubgroup(name_subgroup, description, group_code);
-        return result ? await db.getSubgroupByName(name_subgroup, description, group_code) : null;
+    this.addSubgroup = async ({name_subgroup, user_id, description, group_code}) => {
+        const result = await db.addSubgroup(name_subgroup, user_id, description, group_code);
+        return result ? await db.getSubgroupByName(name_subgroup, user_id, description, group_code) : null;
     };
   
     this.updateSubgroup = async (id, params) => {
@@ -63,12 +62,12 @@ function Journal(options) {
 // SCHEDULE
     this.addSchedule = async ({time, day, lesson_id, subgroup_id}) => {
         const result = await db.addSchedule(time, day, lesson_id, subgroup_id);
-        return result ? await db.getSchedule(time, day, lesson_id, subgroup_id) : null;
+        return result ? await db.getScheduleByParams(time, day, lesson_id, subgroup_id) : null;
     };
 
-    this.updateSchedule = async (id, time, day, lesson_id, subgroup_id) => {
-        const result = await db.updateSchedule(id, time, day, lesson_id, subgroup_id);
-        return result ? await db.getSchedule(time, day, lesson_id, subgroup_id) : null;
+    this.updateSchedule = async (id, params) => {
+        const result = await db.updateSchedule(id, params);
+        return result ? await db.getScheduleById(id) : null;
     };
 
     this.listOfSchedules = () => {
@@ -80,22 +79,23 @@ function Journal(options) {
     };
 
 // OTHERS    
-    this.noteStudents = (noteList, schedule_id) => {
-        let arr = noteList.split(';');
+    this.noteStudents = async ({note_list, schedule_id}) => {
+        let arr = note_list.split(';');
         const res = [];
         if (arr instanceof Array) {
             for (let i = 0; i < arr.length; i++) {
                 let arr2 = arr[i].split(',');
-                if (arr2 && arr2[0] && arr2[1]) { //
-                    res.push({ id: arr2[0], status: arr2[1]});
+                if (arr2 && arr2[0] && arr2[1]) { 
+                    res.push({ id: arr2[0], status: arr2[1] });
                 }
             }
         }
-        return db.noteStudents(res, schedule_id);
+        return await db.noteStudents(res, schedule_id);
     };
 
-    this.uploadData = (startDate, finishDate) => {
-        return db.getUploadData(startDate, finishDate);
+    this.uploadData = ({start_date, FINISH_DATE}) => {
+        console.log(start_date, FINISH_DATE, "jou");
+        return db.getUploadData(start_date, FINISH_DATE);
     };
 }
 

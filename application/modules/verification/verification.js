@@ -15,6 +15,7 @@ function Verification(options) {
         STATUS: 'status',
         SUBGROUP_ID: 'subgroup_id',
         TIME: 'time',
+        USER_ID: 'user_id',
     // А-Я (БЕЗ 0-9)
         NAME: 'name',
         SURNAME: 'surname',
@@ -48,7 +49,8 @@ function Verification(options) {
             case PARAM.SCHEDULE_ID: 
             case PARAM.STATUS:       
             case PARAM.SUBGROUP_ID: 
-            case PARAM.TIME: return !!(value - 0);
+            case PARAM.TIME: 
+            case PARAM.USER_ID: return !!(value - 0);
         // а-яА-Я (БЕЗ 0-9)
             case PARAM.NAME:  
             case PARAM.SURNAME:   
@@ -107,7 +109,7 @@ function Verification(options) {
         if (params instanceof Object) {
             let result = true;
             nameList.forEach(element => {
-                console.log(params, element, params[element], "verification");
+                console.log("verification", params, element, params[element]);
                 if (result && !checkParam(element, params[element])) {
                     result = false;
                 }

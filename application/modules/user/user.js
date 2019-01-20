@@ -36,7 +36,7 @@ function User(options) {
         return null;
     };
 
-    this.addUser = async (role, name, login, password) => {
+    this.addUser = async ({role, name, login, password}) => {
         let hashPassword;
         if (role && name && login && password) {
             hashPassword = md5(login + password);

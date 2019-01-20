@@ -1,7 +1,7 @@
 'use strict';
 
 //почитать про деструктуризацию объектов
-
+// сделать add и прочее по примеру addStudent
 const express = require('express');
 const md5 = require('md5');
 const Verification = require('../modules/verification/verification');
@@ -16,48 +16,46 @@ function Router(options) {
     const errors = new Errors();
 
 // STUDENT  
-/*+*/ // -- означает, что метод проверен и работает
-    // const obj1 = {
-    //     a: 7, b: 2
-    // };
-    // const obj2 = {
-    //     c: 5, d: function () {}
-    // }; /*+*/
-
-    // const obj3 = { ...obj1, ...obj2 };
-    // console.log(obj3);
-
-/*+*/    router.get('/addStudent/:name/:record_book', async (req, res) => {
-        const par = { ...req.params, ...req.query };
-        if (verification.check(par, [PARAM.NAME, PARAM.RECORD_BOOK])) {
-            const result = await journal.addStudent(par);
+    router.get('/addStudent/:name/:record_book', async (req, res) => {
+        // на вход ожидаются параметры: name (обязательный), record_book (обязательный), surname, lastname, status
+        const { surname, lastname, status } = req.query;
+        let params = { ...req.params, surname, lastname, status };
+        const keys = [];
+        for (let key in params) {
+            !params[key] ? delete params[key] : keys.push(key);
+        }
+        if (verification.check(params, keys)) {
+            const result = await journal.addStudent(params);
             res.send((result) ? result : errors.get(2001));
         } else {
-            res.send(errors.get(2002)); // идёт сюда
+            res.send(errors.get(2002)); 
         }
     });
 
-/*+*/    router.get('/updateStudent', async (req, res) => { 
-        let params = { id: req.query.id, name: req.query.name, surname: req.query.surname, lastname: req.query.lastname, 
-                       record_book: req.query.record_book, status: req.query.status };
+    router.get('/updateStudent/:id', async (req, res) => { 
+        // на вход ожидаются параметры: id (обязательный), name, record_book, surname, lastname, status
+        const { name, surname, lastname, status, record_book } = req.query;
+        let params = { ...req.params, name, surname, lastname, status, record_book };
         const keys = [];
         for (let key in params) {
             !params[key] ? delete params[key] : keys.push(key);
         }
         if (verification.check(params, keys)){
-            delete params[params.id];
-            const result = await journal.updateStudent(req.query.id, params);
+            delete params['id'];
+            const result = await journal.updateStudent(req.params.id, params);
             res.send((result) ? result : errors.get(2001)); 
         } else { 
             res.send(errors.get(2002)); 
         } 
     });
 
-/*+*/    router.get('/listOfStudents', async (req, res) => {
+    router.get('/listOfStudents', async (req, res) => {
+        // не ожидается параметров на вход
         res.send(await journal.listOfStudents());
     });
 
-/*+*/    router.get('/deleteStudent/:id', async (req, res) => {
+    router.get('/deleteStudent/:id', async (req, res) => {
+        // на вход ожидается параметр: id (обязательный)
         if (verification.check(req.params, [PARAM.ID])) {
             res.send(await journal.deleteStudent(req.params));
         } else {
@@ -66,17 +64,18 @@ function Router(options) {
     });
 
 // LESSON   
-/*+*/    router.get('/addLesson/:name_lesson', async (req, res) => {
-        const par = { ...req.params, ...req.query };
-        if (verification.check(par, [PARAM.NAME_LESSON])) {
-            const result = await journal.addLesson(par);
+    router.get('/addLesson/:name_lesson', async (req, res) => {
+        // на вход ожидается параметр: name_lesson (обязательный)
+        if (verification.check(req.params, [PARAM.NAME_LESSON])) {
+            const result = await journal.addLesson(req.params);
             res.send((result) ? result : errors.get(2001));
         } else {
             res.send(errors.get(2002));
         }
     });
     
-/*+*/    router.get('/updateLesson/:id/:name_lesson', async (req, res) => { 
+    router.get('/updateLesson/:id/:name_lesson', async (req, res) => { 
+        // на вход ожидаются параметры: name_lesson (обязательный), id (обязательный)
         if (verification.check(req.params, [PARAM.ID, PARAM.NAME_LESSON])) { 
             const result = await journal.updateLesson(req.params.id, req.params.name_lesson);
             res.send((result) ? result : errors.get(2001)); 
@@ -85,11 +84,13 @@ function Router(options) {
         } 
     });
 
-/*+*/    router.get('/listOfLessons', async (req, res) => {
+    router.get('/listOfLessons', async (req, res) => {
+        // не ожидается параметров на вход
         res.send(await journal.listOfLessons());
     });
 
-/*+*/    router.get('/deleteLesson/:id', async (req, res) => {
+    router.get('/deleteLesson/:id', async (req, res) => {
+        // на вход ожидается параметр: id (обязательный)
         if (verification.check(req.params, [PARAM.ID])) {
             res.send(await journal.deleteLesson(req.params));
         } else {
@@ -98,36 +99,46 @@ function Router(options) {
     });
 
 // SUBGROUP   
-/*+*/    router.get('/addSubgroup/:name_subgroup', async (req, res) => {
-        const par = { ...req.params, ...req.query };
-        if (verification.check(par, [PARAM.NAME_SUBGROUP, PARAM.DESCRIPTION, PARAM.GROUP_CODE])) {
-            const result = await journal.addSubgroup(par);
+    router.get('/addSubgroup/:name_subgroup', async (req, res) => {
+        // на вход ожидаются параметры: name_subgroup (обязательный), user_id, description, group_code
+        const { description, user_id, group_code } = req.query;
+        let params = { ...req.params, description, user_id, group_code };
+        const keys = [];
+        for (let key in params) {
+            !params[key] ? delete params[key] : keys.push(key);
+        }
+        if (verification.check(params, keys)) {
+            const result = await journal.addSubgroup(params);
             res.send((result) ? result : errors.get(2001));
         } else {
             res.send(errors.get(2002));
         }
     });
  
-    router.get('/updateSubgroup', async (req, res) => { 
-        let params = { id: req.query.id, name: req.query.name, description: req.query.description, group_code: req.query.group_code };
+    router.get('/updateSubgroup/:id', async (req, res) => { 
+        // на вход ожидаются параметры: id (обязательный), user_id, name, description, group_code
+        const { name, user_id, description, group_code } = req.query;
+        let params = { ...req.params, name, user_id, description, group_code };
         const keys = [];
         for (let key in params) {
             !params[key] ? delete params[key] : keys.push(key);
         }
         if (verification.check(params, keys)){
-            delete params[params.id];
-            const result = await journal.updateSubgroup(req.query.id, params);
+            delete params['id'];
+            const result = await journal.updateSubgroup(req.params.id, params);
             res.send((result) ? result : errors.get(2001));             
         } else { 
             res.send(errors.get(2002)); 
         } 
     });
   
-/*+*/    router.get('/listOfSubgroups', async (req, res) => {
+    router.get('/listOfSubgroups', async (req, res) => {
+        // не ожидается параметров на вход
         res.send(await journal.listOfSubgroups());
     });
     
-/*+*/    router.get('/deleteSubgroup/:id', async (req, res) => { 
+    router.get('/deleteSubgroup/:id', async (req, res) => { 
+        // на вход ожидается параметр: id (обязательный)
         if (verification.check(req.params, [PARAM.ID])) {
             res.send(await journal.deleteSubgroup(req.params));
         } else {
@@ -137,6 +148,7 @@ function Router(options) {
 
 // USER   
     router.get('/login/:login/:hash/:rnd', async (req, res) => {
+        // на вход ожидаются параметры: login (обязательный), hash (обязательный), rnd (обязательный)
         if (verification.check(req.params, [PARAM.LOGIN, PARAM.HASH, PARAM.RND])) {
             const result = await user.login(req.params);
             res.send((result) ? result : errors.get(2003));
@@ -146,6 +158,7 @@ function Router(options) {
     });
     
     router.get('/logout/:token', async (req, res) => {
+        // на вход ожидается параметр: token (обязательный)
         if (verification.check(req.params, [PARAM.TOKEN])) {
             const result = await user.logout(req.params);
             res.send((result) ? result : errors.get(2006));
@@ -155,25 +168,26 @@ function Router(options) {
     });
 
     router.get('/addUser/:role/:name/:login/:password', async (req, res) => {
-        const par = { ...req.params, ...req.query };
-        if (verification.check(par, [PARAM.ROLE, PARAM.NAME, PARAM.LOGIN, PARAM.PASSWORD])) {
-            const result = await user.addUser(par);
+        // на вход ожидаются параметры: role (обязательный), name (обязательный), login (обязательный), password (обязательный)
+        if (verification.check(req.params, [PARAM.ROLE, PARAM.NAME, PARAM.LOGIN, PARAM.PASSWORD])) {
+            const result = await user.addUser(req.params);
             res.send((result) ? result : errors.get(2001));
         } else {
             res.send(errors.get(2002));
         }
     });
 
-    router.get('/updateUser', async (req, res) => { 
-        let params = { token: req.query.token, role: req.query.role, 
-                       name: req.query.name,  login: req.query.login, password: req.query.password };
+    router.get('/updateUser/:token', async (req, res) => { 
+        // на вход ожидаются параметры: id (обязательный), token (обязательный), role, name, login, password
+        const { role, name, login, password } = req.query;
+        let params = { ...req.params, role, name, login, password }; 
         const keys = [];
         for (let key in params) {
             !params[key] ? delete params[key] : keys.push(key);
         }
         if (verification.check(params, keys)){ 
-            delete params[params.token];
-            const result = await user.updateUser(req.query.token, params);
+            delete params['id'];
+            const result = await user.updateUser(req.params.token, params);
             res.send((result) ? result : errors.get(2001)); 
         } else { 
             res.send(errors.get(2002)); 
@@ -181,6 +195,7 @@ function Router(options) {
     });
 
     router.get('/updateUserPassword/:id/:password', async (req, res) => { 
+        // на вход ожидаются параметры: id (обязательный), password (обязательный)
         if (verification.check(req.params, [PARAM.ID, PARAM.PASSWORD])) { 
             const result = await user.updateUserPassword(req.params.id, req.params.password);
             res.send((result) ? result : errors.get(2001)); 
@@ -190,10 +205,12 @@ function Router(options) {
     });
     
     router.get('/listOfUsers', async (req, res) => { // небезопасный, убрать пароли, токены, логины
+        // не ожидается параметров на вход
         res.send(await user.listOfUsers());
     });
   
     router.get('/deleteUser/:id', async (req, res) => {
+        // на вход ожидается параметр: id (обязательный)
         if (verification.check(req.params, [PARAM.ID])) {
             res.send(await user.deleteUser(req.params));
         } else {
@@ -202,39 +219,40 @@ function Router(options) {
     });
   
 // SCHEDULE
-/*+*/    router.get('/addSchedule/:time/:day/:lesson_id/:subgroup_id', async (req, res) => {
-        const par = { ...req.params, ...req.query };
-        if (verification.check(par, [PARAM.TIME, PARAM.DAY, PARAM.LESSON_ID, PARAM.SUBGROUP_ID])) {
-            const result = await journal.addSchedule(par);
+    router.get('/addSchedule/:time/:day/:lesson_id/:subgroup_id', async (req, res) => {
+        // на вход ожидаются параметры: time (обязательный), day (обязательный), lesson_id (обязательный), subgroup_id (обязательный)
+        if (verification.check(req.params, [PARAM.TIME, PARAM.DAY, PARAM.LESSON_ID, PARAM.SUBGROUP_ID])) {
+            const result = await journal.addSchedule(req.params);
             res.send((result) ? result : errors.get(2001));
         } else {
             res.send(errors.get(2002));
         }
     });
 
-    router.get('/updateSchedule', async (req, res) => {
-        let params = { id: req.query.id, time: req.query.time, day: req.query.day, 
-                       lesson_id: req.query.lesson_id, subgroup_id: req.query.subgroup_id };
+    router.get('/updateSchedule/:id', async (req, res) => {
+        // на вход ожидаются параметры: id (обязательный), day, lesson_id, subgroup_id
+        const { day, lesson_id, subgroup_id } = req.query;
+        let params = { ...req.params, day, lesson_id, subgroup_id };
         const keys = [];
         for (let key in params) {
             !params[key] ? delete params[key] : keys.push(key);
         }
         if (verification.check(params, keys)){ 
-            delete params[params.id];
-            const result = await journal.updateSchedule(req.query.id, params);
+            delete params['id'];
+            const result = await journal.updateSchedule(req.params.id, params);
             res.send((result) ? result : errors.get(2001));
         } else {
             res.send(errors.get(2002));
         }
     });
 
-/*+*/    router.get('/listOfSchedules', async (req, res) => {
+    router.get('/listOfSchedules', async (req, res) => {
+        // не ожидается параметров на вход
         res.send(await journal.listOfSchedules());
     });
    
-/*+*/    router.get('/deleteSchedule/:id', (req, res) => {
-        const obj3 = {};
-        console.log(obj3);
+    router.get('/deleteSchedule/:id', (req, res) => {
+        // на вход ожидается параметр: id (обязательный)
         if (verification.check(req.params, [PARAM.ID])) {
             journal.deleteSchedule(req.params).then((result) => res.send(result));
         } else {
@@ -243,27 +261,32 @@ function Router(options) {
     });
  
 // OTHERS    
-    router.get('/noteStudents', async (req, res) => {
-        if (verification.check(req.query, [PARAM.NOTE_LIST, PARAM.SCHEDULE_ID])) {
-            const result = await journal.noteStudents(req.query);
+    router.get('/noteStudents/:note_list/:schedule_id', async (req, res) => {
+        // на вход ожидаются параметры: note_list (обязательный), schedule_id (обязательный)
+        if (verification.check(req.params, [PARAM.NOTE_LIST, PARAM.SCHEDULE_ID])) {
+            const result = await journal.noteStudents(req.params);
             res.send((result) ? result : errors.get(2001));
         } else {
             res.send(errors.get(2002));
         }
     });
 
-    router.get('/uploadData', async (req, res) => {
-        if (verification.check(req.query, [PARAM.START_DATE, PARAM.FINISH_DATE])) {
-            const result = await journal.uploadData(req.query);
+/*НЕ готово*/    router.get('/uploadData/:start_date', async (req, res) => {
+        // на вход ожидаются параметры: start_date (обязательный), finishDate
+        if (verification.check(req.params, [PARAM.START_DATE, PARAM.FINISH_DATE])) {
+            const result = await journal.uploadData(req.params);
             res.send((result) ? result : errors.get(2004));
-        } else  if (startDate && !finishDate) {
+        } else if (verification.check(req.params, [PARAM.START_DATE]) /*&& !finishDate*/) {
             const date = new Date();
             let values = [ date.getDate(), date.getMonth() + 1 ];
-            for( let id in values ) {
+            for (let id in values) {
                 values[ id ] = values[ id ].toString().replace( /^([0-9])$/, '0$1' );
             }
-            finishDate = date.getFullYear() + '-' + values[ 1 ] + '-' + values[ 0 ];
-            const result = journal.uploadData(PARAM.START_DATE, finishDate);
+            let FINISH_DATE = date.getFullYear() + '-' + values[ 1 ] + '-' + values[ 0 ];
+            console.log(req.params);
+            const params = { ...req.params, FINISH_DATE };
+            const result = journal.uploadData(params);
+            console.log(params);
             res.send((result) ? result : errors.get(2004));
         } else {
             res.send(errors.get(2002));
