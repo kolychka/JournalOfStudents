@@ -1,9 +1,7 @@
 'use strict';
 
 //почитать про деструктуризацию объектов
-// сделать add и прочее по примеру addStudent
 const express = require('express');
-const md5 = require('md5');
 const Verification = require('../modules/verification/verification');
 const Errors = require('./errors');
 
@@ -14,6 +12,7 @@ function Router(options) {
     const verification = new Verification();
     const PARAM = verification.getParamNames();
     const errors = new Errors();
+    const logic = options.logic;
 
 // STUDENT  
     router.get('/addStudent/:name/:record_book', async (req, res) => {
@@ -150,7 +149,7 @@ function Router(options) {
     router.get('/login/:login/:hash/:rnd', async (req, res) => {
         // на вход ожидаются параметры: login (обязательный), hash (обязательный), rnd (обязательный)
         if (verification.check(req.params, [PARAM.LOGIN, PARAM.HASH, PARAM.RND])) {
-            const result = await user.login(req.params);
+            const result = await logic.login(req.params); 
             res.send((result) ? result : errors.get(2003));
         } else {
             res.send(errors.get(2002));
@@ -160,7 +159,7 @@ function Router(options) {
     router.get('/logout/:token', async (req, res) => {
         // на вход ожидается параметр: token (обязательный)
         if (verification.check(req.params, [PARAM.TOKEN])) {
-            const result = await user.logout(req.params);
+            const result = await logic.logout(req.params); //user.logout(req.params);
             res.send((result) ? result : errors.get(2006));
         } else {
             res.send(errors.get(2002));

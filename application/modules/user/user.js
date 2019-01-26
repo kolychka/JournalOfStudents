@@ -14,20 +14,20 @@ function User(options) {
         return await db.getUserByToken(token);
     };
 
-    this.login = async ({ login, hash, rnd }) => {
+    this.login = async (login, hash, rnd) => {
         const user = await db.getUser(login); // 1. взять юзера по логину
         const _hash = md5(hash + rnd); // 3. сравнить хеши
         if (user) {
             if (checkPassword({ _hash, user, rnd })) { // 4. если всё хорошо, сгенерировать токен
                 const token = md5(_hash + Math.random() * 1000000);
                 await db.updateUserToken(user.id, token); 
-                return { token, name: user.name };
+                return { id: user.id, role: user.role, name: user.name, token };
             }
         }
         return null;
     };
 
-    this.logout = async ({ token }) => {
+    this.logout = async (token) => {
         const user = await checkToken(token);
         if (user) {
             await db.updateUserToken(user.id, '');

@@ -388,7 +388,7 @@ function DB() {
             });
         });
     };
-    
+
     this.deinit = () => {
         if (db) {
             db.close();

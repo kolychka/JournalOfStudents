@@ -5,12 +5,14 @@ const http = require('http').Server(app);
 const DB = require('./application/modules/db/db');
 const Journal = require('./application/modules/journal/journal');
 const User = require('./application/modules/user/user');
+const Logic = require('./application/modules/logic/logic');
 const Router = require('./application/router/router');
 
 const db = new DB();
 const journal = new Journal({ db });
 const user = new User({ db });
-const router = new Router({ journal, user });
+const logic = new Logic({ user });
+const router = new Router({ journal, user, logic });
 
 app.use(express.static(__dirname + '/public'));
 app.use(router); // use remote router
