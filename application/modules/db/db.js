@@ -157,15 +157,16 @@ function DB() {
     };
 
     this.updateSubgroup = (id, params) => {
-        return new Promise((resolve,reject) => {
+        return new Promise((resolve, reject) => {
             let str = [];
-            let arr =[];
+            let arr = [];
             for (let key in params) {
                 str.push(key + " = ?");
                 arr.push(params[key]);
             }
             arr.push(id);
             const query = "UPDATE subgroup SET " + str.join(', ') + " WHERE id = ?";
+            console.log(query);
             db.run(query, arr, err => resolve(!err));
         });
     };

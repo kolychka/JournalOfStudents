@@ -18,7 +18,7 @@ function Server() {
 
     this.listOfLessons = function (cb) {
         $.get('/listOfLessons', cb);
-    };
+    }; 
 
     this.deleteLesson = function (id, cb) {
         $.get('/deleteLesson/' + id, cb);
@@ -66,5 +66,10 @@ function Server() {
 
     this.uploadData = function (cb) {
         $.get('/uploadData', cb);
+    };
+
+    this.login = async function () {
+        const response = await fetch('/api/login/aaa/bbb/ccc');
+        return await response.json();
     };
 }

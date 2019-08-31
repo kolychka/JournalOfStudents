@@ -47,6 +47,7 @@ function Journal(options) {
     };
   
     this.updateSubgroup = async (id, params) => {
+        console.log(id, params);
         const result = await db.updateSubgroup(id, params);
         return result ? await db.getSubgroupById(id) : null;
     };

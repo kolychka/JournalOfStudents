@@ -1,4 +1,4 @@
-window.onload = function() {
+window.onload = async function() {
     var server = new Server();
     var pages = {
         students: new Students(server), // добавить, удалить студентосов
@@ -18,4 +18,6 @@ window.onload = function() {
     $('.page').hide();
     $('.journal').show();
     pages.journal.show();
+
+    console.log(await server.login());
 };

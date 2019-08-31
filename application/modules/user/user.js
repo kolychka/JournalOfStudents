@@ -63,6 +63,10 @@ function User(options) {
         return (result) ? await db.getUserById(id) : null;
     };
 
+    this.getUserByToken = async (token) => {
+        return await db.getUserByToken(token);
+    };
+    
 }
 
 module.exports = User;

@@ -2,7 +2,7 @@ function Students(server) {
 
     var self = this;
 
-    this.show = function() {
+    this.show = async function() {
         // получить список студентов и обработать события в нем
         server.listOfStudents(function (result) {
             if (result && result.length) {

@@ -17,6 +17,4 @@ const router = new Router({ journal, user, logic });
 app.use(express.static(__dirname + '/public'));
 app.use(router); // use remote router
 
-http.listen(3000, function() {
-  console.log('server start at port 3000');
-});
+http.listen(3000, () => console.log('server start at port 3000'));

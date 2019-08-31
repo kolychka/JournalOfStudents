@@ -1,8 +1,5 @@
-const md5 = require('md5');
-
 function Verification(options) {
     options = (options instanceof Object) ? options : {};
-    const db = options.db;
 
     const PARAM = {
     // ЧИСЛОВЫЕ ЗНАЧЕНИЯ 
@@ -55,10 +52,10 @@ function Verification(options) {
             case PARAM.NAME:  
             case PARAM.SURNAME:   
             case PARAM.LASTNAME: return checkLiteral(value); 
-        // (а-яА-Я) + (0-9)
+        // (а-яА-Я) + (0-9) + СИМВОЛЫ "(", ")", "-", "." //чтобы можно было, как в документах, набрать "ОАБ-09.03.02-31(20)"
             case PARAM.NAME_SUBGROUP:  
             case PARAM.DESCRIPTION:   
-            case PARAM.GROUP_CODE: return checkLiteralNumber(value); 
+            case PARAM.GROUP_CODE: return checkLiteralNumberSpec(value); 
         // СТРОКА ИЗ (0-9) + СИМВОЛЫ "-", ";" И т.п.
             case PARAM.DAY:         
             case PARAM.NOTE_LIST:   
@@ -82,8 +79,8 @@ function Verification(options) {
         return value ? pattern.test(value) : false;
     };
 // (а-яА-Я) + (0-9)
-    function checkLiteralNumber(value) {
-        let pattern = new RegExp(/^[а-яёА-ЯЁ0-9]+$/);
+    function checkLiteralNumberSpec(value) {
+        let pattern = new RegExp(/^[а-яёА-ЯЁ0-9\.\-\(\)]+$/);
         return value ? pattern.test(value) : false;
     };
 // СТРОКА ИЗ (0-9) + СИМВОЛЫ "-", ";" И т.п.
